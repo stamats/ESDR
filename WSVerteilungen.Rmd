@@ -1,0 +1,365 @@
+---
+title: "Kapitel 4: Wahrscheinlichkeitsverteilungen"
+author: "Matthias Kohl"
+date: "April 2020"
+output:
+  rmarkdown::html_document:
+    theme: united
+    highlight: tango
+    toc: true
+---
+
+
+```{r eval=FALSE}
+install.packages(c("distr", "distr6"))
+```
+
+
+```{r}
+library(DescTools)
+library(ggplot2)
+library(MKdescr)
+library(RColorBrewer)
+library(ggsci)
+library(distr)
+library(distr6)
+```
+
+
+## 4.1 Diskrete Verteilungen
+
+### Bernoulli-Verteilung
+
+### Binomialverteilung
+
+```{r}
+## a) Genau eine defekte Glühbirne
+dbinom(1, size = 20, prob = 0.01)
+## b) Keine Person mit Diabetes
+dbinom(0, size = 50, prob = 0.09)
+## b) Genau eine Person mit Diabetes
+dbinom(1, size = 50, prob = 0.09)
+```
+
+
+```{r}
+## b) Mindestens zwei Personen mit Diabetes: 1-P(X<=1)
+1 - pbinom(1, size = 50, prob = 0.09)
+```
+
+
+```{r}
+## b) Mindestens zwei Personen mit Diabetes: P(X>1)
+pbinom(1, size = 50, prob = 0.09, lower.tail = FALSE)
+```
+
+
+```{r}
+qbinom(0.99, size = 20, prob = 0.01)
+```
+
+
+```{r}
+pbinom(2, size = 20, prob = 0.01, lower.tail = FALSE)
+```
+
+
+```{r}
+rbinom(10, size = 50, prob = 0.09)
+```
+
+
+```{r}
+library(distr)
+X <- Binom(size = 20, prob = 0.01)
+```
+
+
+```{r, fig.width = 10}
+plot(X)
+```
+
+
+```{r}
+library(distr6)
+X6 <- Binomial$new(prob = 0.09, size = 50)
+```
+
+
+```{r fig.width = 8}
+plot(X6)
+```
+
+
+```{r }
+summary(X6)
+```
+
+
+### Hypergeometrische Verteilung
+
+```{r}
+## a) keine defekte Glühbirne
+dhyper(0, m = 5, n = 495, k = 20)
+## b) keine Person mit Diabetes
+dhyper(0, m=6000, n=60000, k = 50)
+```
+
+
+```{r}
+## b) mind. eine Person mit Diabetes
+phyper(0, m=6000, n=60000, k=50, lower.tail = FALSE)
+```
+
+
+```{r}
+rhyper(10, m=6000, n=60000, k=50)
+```
+
+
+```{r, fig.width = 10}
+X <- Hyper(m=5, n=495, k=20)
+plot(X)
+```
+
+
+```{r}
+X6 <- Hypergeometric$new(size = 500, successes = 5, draws = 20)
+summary(X6)
+```
+
+
+```{r}
+## Wahrscheinlichkeit für 0, 1, 2, 3 defekte Glühbirnen
+## mit Zurücklegen
+round(dbinom(0:3, size=20, prob=0.01), 4)
+## ohne Zurücklegen
+round(dhyper(0:3, m=5, n=495, k=20), 4)
+```
+
+
+```{r}
+0:3
+```
+
+
+### Negative Binomialverteilung
+
+```{r}
+## a) 20. Glühbirne = 1. defekte Glühbirne
+dnbinom(19, size = 1, prob = 0.01)
+## b) Max. 250 Personen für 20 Personen mit Diabetes
+pnbinom(230, size = 20, prob = 0.09)
+```
+
+
+```{r}
+qnbinom(0.95, size = 20, prob = 0.09)
+```
+
+
+```{r}
+rnbinom(10, size = 20, prob = 0.09)
+```
+
+
+```{r, fig.width = 10}
+X <- Nbinom(size = 1, prob = 0.01)
+plot(X, cex.points = 0.75)
+```
+
+
+```{r}
+X6 <- NegativeBinomial$new(size = 1, prob = 0.01)
+summary(X6)
+```
+
+
+### Poisson-Verteilung
+
+```{r}
+## a) Keine defekte Glühbirne
+dpois(0, lambda = 1.4)
+```
+
+
+```{r}
+## a) Mind. eine defekte Glühbirne
+ppois(0, lambda = 1.4, lower.tail = FALSE)
+## b) Mind. 450 Neuerkrankungen
+ppois(450, lambda = 495, lower.tail = FALSE)
+```
+
+
+```{r}
+qpois(0.99, lambda = 1.4)
+```
+
+
+```{r}
+ppois(5, lambda = 1.4)
+```
+
+
+```{r}
+rpois(10, lambda = 495)
+```
+
+
+```{r, fig.width = 10}
+X <- Pois(lambda = 1.4)
+plot(X)
+```
+
+
+```{r}
+X6 <- Poisson$new(rate = 1.4)
+summary(X6)
+```
+
+
+## 4.2 Stetige Verteilungen
+
+### Normalverteilung
+
+```{r}
+curve(expr = dnorm(x, mean = 167, sd = 6.0), from = 140, to = 210, n = 501,
+      col = "#E41A1C", xlab = "Körpergröße in cm", ylab = "Dichte",
+      main = "Körpergröße deutscher Männer und Frauen")
+curve(expr = dnorm(x, mean = 180, sd = 6.5), from = 140, to = 210, n = 501,
+      add = TRUE, col = "#377EB8")
+legend("topleft", legend = c("Frauen", "Männer"), fill = c("#E41A1C", "#377EB8"))
+```
+
+
+```{r}
+pnorm(175, mean = 167, sd = 6.0, lower.tail = FALSE)
+```
+
+
+```{r}
+qnorm(0.95, mean = 180, sd = 6.5)
+```
+
+
+```{r, fig.width = 10}
+X <- Norm(mean = 100, sd = 15)
+plot(X)
+```
+
+
+```{r}
+X6 <- Normal$new(mean = 100, sd = 15)
+summary(X6)
+```
+
+
+### log-Normalverteilung
+
+```{r, fig.width = 10}
+X <- Lnorm(meanlog = 0.063, sdlog = 0.7)
+plot(X)
+```
+
+```{r}
+X6 <- Lognormal$new(meanlog = 0.063, sdlog = 0.7)
+summary(X6)
+```
+
+
+### Gamma-Verteilung
+
+```{r, fig.width = 10}
+X <- Exp(rate = 0.34657)
+plot(X)
+```
+
+
+```{r}
+X6 <- Exponential$new(rate = 0.34657)
+summary(X6)
+```
+
+
+```{r}
+pexp(1, rate = 0.34657)
+```
+
+
+```{r}
+qexp(0.99, rate = 0.34657)
+```
+
+
+```{r}
+curve(dgamma(x, scale = 5, shape = 1.8), from = 0, to = 30, n = 501,
+      xlab = "Aufenthaltsdauer in Tagen", ylab = "Dichte",
+      main = "Eine ausgewählte DRG")
+```
+
+
+```{r}
+X6 <- Gamma$new(shape = 1.8, scale = 5)
+summary(X6)
+```
+
+
+```{r}
+pgamma(10, scale = 5, shape = 1.8, lower.tail = FALSE)
+```
+
+
+```{r}
+qgamma(0.99, scale = 5, shape = 1.8)
+```
+
+
+### Weibull-Verteilung
+
+```{r}
+curve(dweibull(x, scale = 1/0.34657, shape = 2.12), from = 0, to = 30, n = 501,
+      xlab = "Lebensdauer in Jahren", ylab = "Dichte",
+      main = "Lebensdauer eines Smartphone-Akkus inkl. Alterung")
+```
+
+
+```{r}
+X6 <- distr6::Weibull$new(shape = 2.12, scale = 1/0.34657)
+summary(X6)
+```
+
+
+```{r}
+pweibull(1, scale = 1/0.34657, shape = 2.12)
+```
+
+
+```{r qweibull}
+qweibull(0.99, scale = 1/0.34657, shape = 2.12)
+```
+
+
+```{r, fig.width = 10}
+X <- Weibull(scale = 5.5, shape = 2)
+plot(X)
+```
+
+
+```{r}
+X6 <- distr6::Weibull$new(shape = 2, scale = 5.5)
+summary(X6)
+```
+
+
+```{r}
+qweibull(0.5, scale = 5.5, shape = 2)
+```
+
+
+```{r}
+pweibull(11, scale = 5.5, shape = 2, lower.tail = FALSE)
+```
+
+
+### $\chi^2$-, t- und F-Verteilung
+

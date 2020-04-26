@@ -1,0 +1,161 @@
+---
+title: "Kapitel 3: Farben und Diagramme"
+author: "Matthias Kohl"
+date: "April 2020"
+output:
+  rmarkdown::html_document:
+    theme: united
+    highlight: tango
+    toc: true
+---
+
+```{r eval=FALSE}
+install.packages(c("RColorBrewer", "ggsci"))
+```
+
+
+```{r}
+library(DescTools)
+library(ggplot2)
+library(MKdescr)
+library(RColorBrewer)
+library(ggsci)
+```
+
+
+## 3.1 Farben
+
+```{r}
+library(RColorBrewer)
+display.brewer.all(type = "qual")
+```
+
+
+```{r}
+display.brewer.all(type = "seq")
+```
+ 
+ 
+```{r}
+display.brewer.all(type = "div")
+```
+
+
+```{r}
+## n = 5 Farben der Palette mit Namen Set1
+farben <- brewer.pal(n = 5, name = "Set1")
+farben
+```
+
+
+```{r rgb}
+rgb(red = 228, green = 26, blue = 28, maxColorValue = 255)
+```
+
+
+```{r}
+col2rgb("royalblue")
+```
+
+
+```{r, fig.width=9}
+ITSDaten <- read.csv2(file = "ITSDaten.csv", fileEncoding = "utf8")
+barplot(table(ITSDaten$OP), main = "Operationsarten",
+        ylab = "Absolute Häufigkeiten", col = farben)
+```
+
+
+```{r, fig.width=9}
+library(ggsci)
+## Anlegen der Daten
+ggplot(ITSDaten, aes(x=OP)) +
+  ## Hinzufügen der Balken für die relativen Häufigkeiten
+  geom_bar(aes(y = 100*(..count..)/sum(..count..)), width = 0.5, 
+  ## Füllen der Balken
+           fill = pal_npg()(5)) +
+  ## Titel und Beschriftung der y-Achse
+  ggtitle("Operationsarten") + ylab("Relative Häufigkeit in %")
+```
+
+
+## 3.2 Exkurs: Export von Diagrammen
+
+```{r, eval = FALSE}
+## 1. Öffnen des Grafikgerätes png
+## height und width in Pixel
+png(file = "Beispiel_Bild.png", height = 640, width = 640)
+## 2. Erzeugen des Plots
+barplot(table(ITSDaten$OP), main = "Operationsarten",
+        ylab = "Absolute Häufigkeiten", col = farben)
+## 3. Beenden des Grafikgerätes
+dev.off()
+```
+
+
+## 3.3 Diagramme
+
+```{r, fig.width=9}
+farben <- brewer.pal(n = 5, name = "Set3")
+boxplot(SAPS.II ~ OP, data = ITSDaten, ylab = "SAPS II",
+        main = "SAPS II in Abhängigkeit von der OP Art", col = farben)
+```
+
+
+```{r, fig.width=9}
+## Anlegen der Daten
+ggplot(ITSDaten, aes(x = OP, y = SAPS.II)) +
+  ## Box-und-Whisker Plot mit den vorgegeben Farben
+  geom_boxplot(fill = farben) +
+  ## Beschriftung
+  ylab("SAPS II") + ggtitle("SAPS II in Abhängigkeit von der OP Art")
+```
+
+
+```{r}
+farben1 <- rev(brewer.pal(5, "Blues"))
+farben2 <- rep("#31A354", 3)
+farben3 <- brewer.pal(9, "Reds")
+hist(ITSDaten$Temperatur[-398], breaks = seq(from = 33.5, to = 42, by = 0.5),
+     main = "500 ITS Patienten", ylab = "Absolute Häufigkeit",
+     xlab = "Maximale Körpertemperatur", col = c(farben1, farben2, farben3))
+```
+ 
+
+```{r}
+ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
+  geom_histogram(binwidth = 0.5, fill = c(farben1, farben2, farben3))+
+  ylab("Absolute Häufigkeit") + xlab("Maximale Körpertemperatur") +
+  ggtitle("500 ITS Patienten")
+```
+
+
+```{r}
+## Anlegen eines leeren Vektors
+farbenGeschlecht <- character(nrow(ITSDaten))
+## Auffüllen mit Farben
+farbenGeschlecht[ITSDaten$Geschlecht == "weiblich"] <- "#E41A1C"
+farbenGeschlecht[ITSDaten$Geschlecht == "männlich"] <- "#377EB8"
+```
+
+
+```{r}
+plot(x = ITSDaten$Temperatur, y = ITSDaten$Herzfrequenz, pch = 19,
+     xlab = "Maximal Körpertemperatur", ylab = "Maximale Herzfrequenz",
+     main = "500 ITS Patienten",
+     col = farbenGeschlecht, xlim = c(33,43))
+legend(x = "topleft", legend = c("weiblich", "männlich"), pch = 19,
+       col = c("#E41A1C", "#377EB8"))
+```
+
+
+```{r, fig.width=8}
+ggplot(ITSDaten[-398,], aes(x=Temperatur, y=Herzfrequenz, colour=Geschlecht)) +
+  ## shape = 19: etwas größerer Punkt
+  ## alpha = 0.4: Stärke des Blendings
+  geom_point(shape=19, alpha=0.4) +
+  ## Werte für die Farbgebung
+  scale_colour_manual(values = c("#377EB8", "#E41A1C")) +
+  ## Beschriftung
+  ggtitle("500 ITS Patienten") + xlab("Maximale Körpertemperatur") +
+  ylab("Maximale Herzfrequenz")
+```

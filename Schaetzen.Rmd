@@ -1,0 +1,427 @@
+---
+title: "Kapitel 5: Schätzen"
+author: "Matthias Kohl"
+date: "April 2020"
+output:
+  rmarkdown::html_document:
+    theme: united
+    highlight: tango
+    toc: true
+---
+
+```{r eval=FALSE}
+install.packages(c("distrMod", "qqplotr", "RobLox", "MKinfer", 
+                   "ROptEst", "MKpower"))
+```
+
+
+```{r}
+library(DescTools)
+library(ggplot2)
+library(MKdescr)
+library(RColorBrewer)
+library(ggsci)
+library(distr)
+library(distr6)
+library(distrMod)
+library(qqplotr)
+library(RobLox)
+library(MKinfer)
+library(ROptEst)
+library(MKpower)
+```
+
+
+## 5.1 Einführung
+
+## 5.2 Punktschätzer
+
+```{r}
+ITSDaten <- read.csv2(file = "ITSDaten.csv", fileEncoding = "utf8")
+## biasfrei und effizient
+table(ITSDaten$Leberversagen)/nrow(ITSDaten)
+```
+
+
+```{r}
+## biasfrei und effizient
+mean(ITSDaten$Temperatur[-398])
+## biasfrei
+sd(ITSDaten$Temperatur[-398])
+```
+
+
+```{r Temperatur1}
+pnorm(10, mean = 37.7, sd = 1.2)
+```
+
+
+```{r}
+library(MASS)
+fitdistr(ITSDaten$Temperatur[-398], densfun = "normal")
+```
+
+
+```{r}
+library(distrMod)
+## Ausgabeoption ändern
+distrModOptions(show.details = "minimal")
+## Anlegen des Modells
+Modell <- NormLocationScaleFamily()
+## ML-Schätzung
+MLEstimator(ITSDaten$Temperatur[-398], Modell)
+```
+
+
+```{r}
+hist(ITSDaten$Temperatur[-398], breaks = seq(from = 33, to = 42, by = 0.5),
+     main = "Maximale Körpertemperatur", ylab = "Dichte", freq = FALSE)
+lines(density(ITSDaten$Temperatur[-398]))
+curve(dnorm(x, mean = 37.7, sd = 1.2), col = "darkred", from = 33, to = 42,
+      n = 501, add = TRUE, lwd = 2)
+legend("topright", fill = "darkred", legend = "Geschätztes Modell")
+```
+
+
+```{r}
+ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
+  geom_histogram(aes(y=..density..), binwidth = 0.5, fill = "darkgrey") +
+  geom_density(color = "orange") + ylab("Dichte") +
+  stat_function(fun = dnorm, args = list(mean = 37.7, sd = 1.2),
+                color = "darkred", lwd = 2) +
+  annotate("text", x = 40, y = 0.31, col = "darkred",
+           label = "Geschätztes Modell")+
+  ggtitle("Maximale Körpertemperatur")
+```
+
+
+```{r}
+qqnorm(ITSDaten$Temperatur[-398], main = "qq-Plot für die Normalverteilung",
+       ylab = "Maximale Körpertemperatur")
+qqline(ITSDaten$Temperatur[-398])
+```
+
+
+```{r}
+library(ggplot2)
+ggplot(ITSDaten[-398,], aes(sample = Temperatur)) + 
+  stat_qq() + ggplot2::stat_qq_line() +
+  xlab("Theoretische Quantile") + 
+  ylab("Beobachtete Maximale Körpertemperatur") + 
+  ggtitle("qq-Plot für die Normalverteilung")
+```
+
+
+```{r}
+ggplot(ITSDaten[-398,], aes(sample = Temperatur)) + 
+  stat_qq(dparams = list(mean = 37.7, sd = 1.2)) + 
+  ggplot2::stat_qq_line(dparams = list(mean = 37.7, sd = 1.2)) +
+  xlab("Modell für Maximale Körpertemperatur") + 
+  ylab("Beobachtete Maximale Körpertemperatur") + 
+  ggtitle("qq-Plot für Norm(37.7, 1.2)")
+```
+
+
+```{r}
+qqplot(ITSDaten$Temperatur[-398], Norm(mean = 37.7, sd = 1.2),
+       xlab = "Maximale Körpertemperatur",
+       main = "qq-Plot für Norm(37.7, 1.2)")
+```
+
+
+```{r}
+library(qqplotr)
+ggplot(ITSDaten[-398,], aes(sample = Temperatur)) + 
+  qqplotr::stat_qq_band(dparams = list(mean = 37.7, sd = 1.2)) + 
+  qqplotr::stat_qq_point(dparams = list(mean = 37.7, sd = 1.2)) + 
+  qqplotr::stat_qq_line(dparams = list(mean = 37.7, sd = 1.2)) + 
+  xlab("Modell für Maximale Körpertemperatur") + 
+  ylab("Beobachtete Maximale Körpertemperatur") + 
+  ggtitle("qq-Plot für Norm(37.7, 1.2)")
+```
+
+
+```{r, fig.height=10, fig.width=10}
+par(mfrow=c(3,3))
+for(i in 1:9){
+  x <- rnorm(499)
+  qqnorm(x)
+  qqline(x)
+}
+```
+
+
+```{r}
+library(MKdescr)
+median(ITSDaten$Temperatur)
+mad(ITSDaten$Temperatur)
+sIQR(ITSDaten$Temperatur)
+```
+
+
+```{r}
+Modell <- NormLocationScaleFamily()
+CvMMDEstimator(ITSDaten$Temperatur[-398], Modell)
+```
+
+
+```{r}
+KolmogorovMDEstimator(ITSDaten$Temperatur[-398], Modell)
+```
+
+
+```{r MDEvsMLE}
+## ML-Schätzer
+MLEstimator(ITSDaten$Temperatur, Modell)
+## CvM-MD-Schätzer
+CvMMDEstimator(ITSDaten$Temperatur, Modell)
+## KS-MD-Schätzer
+KolmogorovMDEstimator(ITSDaten$Temperatur, Modell)
+```
+
+
+```{r}
+library(RobLox)
+roblox(ITSDaten$Temperatur, eps.lower = 1/500, eps.upper = 0.05, k = 3)
+```
+
+
+## 5.2 Konfidenzintervalle
+
+```{r}
+library(MKinfer)
+meanCI(ITSDaten$Temperatur[-398])
+```
+
+
+```{r}
+t.test(ITSDaten$Temperatur[-398])$conf.int
+```
+
+
+```{r}
+qt(1-0.05/2, df = 499-1)
+qnorm(1-0.05/2)
+```
+
+
+```{r}
+library(MASS)
+## ML-Schätzer
+ML <- fitdistr(ITSDaten$Temperatur[-398], densfun = "normal")
+## Approximatives Konfidenzintervall
+confint(ML)
+```
+
+
+```{r}
+library(distrMod)
+## Modell
+Modell <- NormLocationScaleFamily()
+## ML-Schäter
+ML2 <- MLEstimator(ITSDaten$Temperatur[-398], Modell)
+## Approximatives Konfidenzintervall
+confint(ML2)
+```
+
+
+```{r}
+## nur Standardabweiung
+sdCI(ITSDaten$Temperatur[-398])
+## Mittelwert und Standardabweichung
+normCI(ITSDaten$Temperatur[-398])
+```
+
+
+```{r}
+normCI(ITSDaten$Temperatur[-398], boot = TRUE, bootci.type = "bca")
+```
+
+
+```{r}
+## Häufigkeit von Leberversagen
+table(ITSDaten$Leberversagen)
+## Wilson-Intervall
+binomCI(x = 20, n = 500)
+## Clopper-Pearson-Intervall
+binomCI(x = 20, n = 500, method = "clopper-pearson")
+## Agresti-Coull-Intervall
+binomCI(x = 20, n = 500, method = "agresti-coull")
+```
+
+
+```{r}
+## ohne Stetigkeitskorrektur
+binomCI(x = 20, n = 500, method = "wald")
+## mit Stetigkeitskorrektur
+binomCI(x = 20, n = 500, method = "wald-cc")
+```
+
+
+```{r cache = TRUE}
+binomCI(x = 20, n = 500, method = "boot")
+```
+
+
+```{r}
+## Bernoulli-Modell
+Modell <- BinomFamily(size = 1)
+## ML-Schätzer
+MLp <- MLEstimator(ITSDaten$Leberversagen, Modell)
+MLp
+## Konfidenzintervall
+confint(MLp)
+```
+
+
+```{r}
+## Exaktes Konfidenzintervall für den Median
+medianCI(ITSDaten$Temperatur)
+## Exaktes Konfidenzintervall für den MAD
+madCI(ITSDaten$Temperatur)
+```
+
+
+```{r}
+## Asymptotisches Konfidenzintervall für den Median
+medianCI(ITSDaten$Temperatur, method = "asymptotic")
+## Asymptotisches Konfidenzintervall für den MAD
+madCI(ITSDaten$Temperatur, method = "asymptotic")
+```
+
+
+```{r }
+## Bootstrap-Konfidenzintervall für den Median
+medianCI(ITSDaten$Temperatur, method = "boot")
+## Bootstrap-Konfidenzintervall für den MAD
+madCI(ITSDaten$Temperatur, method = "boot")
+```
+
+
+```{r}
+## Modell
+Modell <- NormLocationScaleFamily()
+## CvM-MD-Schätzer inkl. Varianz
+MD <- CvMMDEstimator(ITSDaten$Temperatur, Modell)
+## 95%-Konfidenzintervall
+confint(MD)
+```
+
+
+```{r}
+## Modell
+Modell <- BinomFamily(size = 1)
+## CvM-MD-Schätzer inkl. Varianz
+MDp <- CvMMDEstimator(ITSDaten$Leberversagen, Modell)
+## 95%-Konfidenzintervall
+confint(MDp)
+```
+
+
+```{r}
+library(boot)
+## x: Vektor der Beobachtungen
+## i: Vektor der Indizes der Bootstrap-Stichprobe
+KSMDEst <- function(x, i){
+  estimate(KolmogorovMDEstimator(x[i], ParamFamily = BinomFamily(size = 1)))
+}
+```
+
+
+```{r}
+## Bootstrap-Schätzungen
+boot.out <- boot(ITSDaten$Leberversagen, statistic = KSMDEst, R = 999)
+## Bootstrap-Konfidenzintervalle
+boot.ci(boot.out)
+```
+
+
+```{r}
+ALest <- roblox(ITSDaten$Temperatur, eps.lower = 1/500, 
+                eps.upper = 0.05, k = 3)
+confint(ALest)
+```
+
+
+
+```{r }
+confint(ALest, symmetricBias())
+```
+
+
+```{r}
+## x: Vektor der Beobachtungen
+## i: Vektor der Indizes der Bootstrap-Stichprobe
+RMXEst <- function(x, i){
+  res <- roblox(x[i], eps.lower = 1/500, eps.upper = 0.05, k = 3)
+  c(estimate(res), diag(asvar(res)))
+}
+```
+
+
+```{r}
+## Bootstrap-Schätzungen
+boot.out <- boot(ITSDaten$Temperatur, statistic = RMXEst, R = 999)
+## Bootstrap-Konfidenzintervall für den Mittelwert
+boot.ci(boot.out, index = c(1,3))
+## Bootstrap-Konfidenzintervall für die Standardabweichung
+boot.ci(boot.out, index = c(2,4))
+```
+
+
+```{r}
+library(ROptEst)
+Modell <- BinomFamily(size = 1)
+ALest <- roptest(ITSDaten$Leberversagen, Modell,
+                 eps.lower = 0, eps.upper = 0.02, steps = 3)
+confint(ALest)
+confint(ALest, symmetricBias())
+```
+
+
+```{r}
+qnorm(0.975)
+```
+
+
+```{r}
+## Werte für p
+p <- seq(from = 0.01, to = 0.99, length = 100)
+## Standardabweichung
+SD <- sqrt(p*(1-p))
+## Grafische Darstellung
+DF <- data.frame(p, SD)
+ggplot(DF, aes(x = p, y = SD)) + geom_line() + 
+  ylab(expression(sqrt(p*(1-p)))) + 
+  xlab("p") + ggtitle("Standardabweichung von Bernoulli(p)")
+```
+
+
+```{r, fig.width = 8}
+## Stichprobengröße
+n <- seq(60, 10000, by = 20)
+## Maximaler Schätzfehler
+maxFehler <- 97.5/sqrt(n)
+## Grafische Darstellung
+DF <- data.frame(n, maxFehler)
+ggplot(DF, aes(x = n, y = maxFehler)) + geom_line() + ylab("Prozent [%]") + 
+  xlab("Stichprobengröße") + ggtitle("Maximaler Schätzfehler")
+```
+
+
+```{r}
+library(MKpower)
+## ohne Stetigkeitskorrektur
+ssize.propCI(0.5, width = 0.062, method = "wald")
+## mit Stetigkeitskorrektur
+ssize.propCI(0.5, width = 0.062, method = "wald-cc")
+```
+
+
+```{r}
+## ohne Stetigkeitskorrektur
+ssize.propCI(0.5, width = 0.0088, method = "wald")
+## mit Stetigkeitskorrektur
+ssize.propCI(0.5, width = 0.0088, method = "wald-cc")
+```
+
