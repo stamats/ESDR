@@ -9,7 +9,15 @@ output:
     toc: true
 ---
 
-```{r eval=FALSE}
+<<>>=
+@
+```{r, eval=FALSE}
+install.packages("BiocManager")
+BiocManager::install("Biobase")
+```
+
+
+```{r, eval=FALSE}
 install.packages(c("distrMod", "qqplotr", "RobLox", "MKinfer", 
                    "ROptEst", "MKpower"))
 ```
@@ -51,7 +59,7 @@ sd(ITSDaten$Temperatur[-398])
 ```
 
 
-```{r Temperatur1}
+```{r}
 pnorm(10, mean = 37.7, sd = 1.2)
 ```
 
@@ -170,7 +178,7 @@ KolmogorovMDEstimator(ITSDaten$Temperatur[-398], Modell)
 ```
 
 
-```{r MDEvsMLE}
+```{r}
 ## ML-Schätzer
 MLEstimator(ITSDaten$Temperatur, Modell)
 ## CvM-MD-Schätzer
@@ -258,7 +266,7 @@ binomCI(x = 20, n = 500, method = "wald-cc")
 ```
 
 
-```{r cache = TRUE}
+```{r}
 binomCI(x = 20, n = 500, method = "boot")
 ```
 
@@ -290,7 +298,7 @@ madCI(ITSDaten$Temperatur, method = "asymptotic")
 ```
 
 
-```{r }
+```{r}
 ## Bootstrap-Konfidenzintervall für den Median
 medianCI(ITSDaten$Temperatur, method = "boot")
 ## Bootstrap-Konfidenzintervall für den MAD
@@ -344,7 +352,7 @@ confint(ALest)
 
 
 
-```{r }
+```{r}
 confint(ALest, symmetricBias())
 ```
 
