@@ -104,6 +104,19 @@ ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
 
 
 ```{r}
+library(ggplot2)
+library(qqplotr)
+ggplot(ITSDaten[-398,], aes(sample = Temperatur)) + 
+  qqplotr::stat_pp_band(dparams = list(mean = 37.7, sd = 1.2)) + 
+  qqplotr::stat_pp_point(dparams = list(mean = 37.7, sd = 1.2)) + 
+  qqplotr::stat_pp_line() + 
+  xlab("Modell für Maximale Körpertemperatur") + 
+  ylab("Beobachtete Maximale Körpertemperatur") + 
+  ggtitle("qq-Plot für Norm(37.7, 1.2)")
+```
+
+
+```{r}
 qqnorm(ITSDaten$Temperatur[-398], main = "qq-Plot für die Normalverteilung",
        ylab = "Maximale Körpertemperatur")
 qqline(ITSDaten$Temperatur[-398])
@@ -111,7 +124,6 @@ qqline(ITSDaten$Temperatur[-398])
 
 
 ```{r}
-library(ggplot2)
 ggplot(ITSDaten[-398,], aes(sample = Temperatur)) + 
   stat_qq() + ggplot2::stat_qq_line() +
   xlab("Theoretische Quantile") + 
@@ -124,6 +136,7 @@ ggplot(ITSDaten[-398,], aes(sample = Temperatur)) +
 ggplot(ITSDaten[-398,], aes(sample = Temperatur)) + 
   stat_qq(dparams = list(mean = 37.7, sd = 1.2)) + 
   ggplot2::stat_qq_line(dparams = list(mean = 37.7, sd = 1.2)) +
+  geom_abline(slope = 1, color = "blue") +
   xlab("Modell für Maximale Körpertemperatur") + 
   ylab("Beobachtete Maximale Körpertemperatur") + 
   ggtitle("qq-Plot für Norm(37.7, 1.2)")
@@ -138,11 +151,10 @@ qqplot(ITSDaten$Temperatur[-398], Norm(mean = 37.7, sd = 1.2),
 
 
 ```{r}
-library(qqplotr)
 ggplot(ITSDaten[-398,], aes(sample = Temperatur)) + 
-  qqplotr::stat_qq_band(dparams = list(mean = 37.7, sd = 1.2)) + 
+  qqplotr::stat_qq_band(dparams = list(mean = 37.7, sd = 1.2), identity = TRUE) + 
   qqplotr::stat_qq_point(dparams = list(mean = 37.7, sd = 1.2)) + 
-  qqplotr::stat_qq_line(dparams = list(mean = 37.7, sd = 1.2)) + 
+  qqplotr::stat_qq_line(dparams = list(mean = 37.7, sd = 1.2), identity = TRUE) + 
   xlab("Modell für Maximale Körpertemperatur") + 
   ylab("Beobachtete Maximale Körpertemperatur") + 
   ggtitle("qq-Plot für Norm(37.7, 1.2)")
