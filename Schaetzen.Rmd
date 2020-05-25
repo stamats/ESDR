@@ -1,7 +1,7 @@
 ---
 title: "Kapitel 5: Schätzen"
 author: "Matthias Kohl"
-date: "April 2020"
+date: "Mai 2020"
 output:
   rmarkdown::html_document:
     theme: united
@@ -9,17 +9,15 @@ output:
     toc: true
 ---
 
-<<>>=
-@
 ```{r, eval=FALSE}
 install.packages("BiocManager")
-BiocManager::install("Biobase")
+BiocManager::install("Biobase", update = FALSE)
 ```
 
 
 ```{r, eval=FALSE}
 install.packages(c("distrMod", "qqplotr", "RobLox", "MKinfer", 
-                   "ROptEst", "MKpower"))
+                   "ROptEst", "RobExtremes", "MKpower"))
 ```
 
 
@@ -36,6 +34,7 @@ library(qqplotr)
 library(RobLox)
 library(MKinfer)
 library(ROptEst)
+library(RobExtremes)
 library(MKpower)
 ```
 
