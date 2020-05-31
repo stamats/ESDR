@@ -1,0 +1,539 @@
+---
+title: "Kapitel 6: Statistische Hypothesentests"
+author: "Matthias Kohl"
+date: "Mai 2020"
+output:
+  rmarkdown::html_document:
+    theme: united
+    highlight: tango
+    toc: true
+---
+
+```{r eval=FALSE}
+BiocManager::install("mixOmics", update = FALSE)
+install.packages(c("RVAideMemoire", "coin", "exactRankTests", 
+                   "ggpubr", "datarium", "gridExtra", "NSM3"))
+```
+
+
+```{r message=FALSE}
+library(DescTools)
+library(ggplot2)
+library(MKdescr)
+library(RColorBrewer)
+library(ggsci)
+library(distr)
+library(distr6)
+library(distrMod)
+library(qqplotr)
+library(RobLox)
+library(MKinfer)
+library(ROptEst)
+library(RobExtremes)
+library(MKpower)
+library(RVAideMemoire)
+library(coin)
+library(exactRankTests)
+library(ggpubr)
+library(datarium)
+library(gridExtra)
+library(NSM3)
+```
+
+## 6.1 Einführung
+
+## 6.2 Nominale Merkmale
+
+```{r}
+ITSDaten <- read.csv2(file = "ITSDaten.csv", fileEncoding = "utf8")
+table(ITSDaten$Leberversagen)
+## exakter Test
+binom.test(20, 500, p = 0.05, alternative = "less")
+## asymptotischer Test mit Stetigkeitskorrektur
+prop.test(20, 500, p = 0.05, alternative = "less")
+## asymptotischer Test ohne Stetigkeitskorrektur
+prop.test(20, 500, p = 0.05, alternative = "less", correct = FALSE)
+```
+
+
+```{r cache=TRUE}
+binomCI(20, 500, method = "boot", alternative = "less")
+```
+
+
+```{r }
+## exakter Test
+binom.test(20, 500, p = 0.06, alternative = "less")
+```
+
+
+```{r cache=TRUE}
+table(ITSDaten$Ergebnis)
+multinomial.test(as.vector(table(ITSDaten$Ergebnis)), 
+                 p = c(0.2, 0.30, 0.40, 0.1))
+```
+
+
+```{r }
+## 2x2 Kontingenztafel
+kont.tafel <- table(ITSDaten$Geschlecht, ITSDaten$Leberversagen)
+kont.tafel
+prop.test(c(7, 13), c(175, 325))
+```
+
+
+```{r }
+binomDiffCI(a = 7, b = 13, c = 168, d = 312)
+```
+
+
+```{r cache=TRUE}
+binomDiffCI(a = 7, b = 13, c = 168, d = 312, method = "boot")
+```
+
+
+```{r }
+## exakter Test von Fisher
+fisher.test(kont.tafel)
+## chi^2-Test
+chisq.test(kont.tafel)
+```
+
+
+```{r }
+chisq_test(kont.tafel, distribution = "approximate")
+```
+
+
+```{r }
+CramerV(x = kont.tafel, conf.level = 0.95, method = "fisheradj")
+```
+
+
+```{r }
+cramer.test(kont.tafel)
+```
+
+
+```{r }
+kont.tafel <- table(ITSDaten$OP, ITSDaten$Ergebnis)
+kont.tafel
+## exakter Test von Fisher
+fisher.test(kont.tafel, simulate.p.value = TRUE, B = 1e5)
+## chi^2-Test
+chisq.test(kont.tafel)
+chisq_test(kont.tafel, distribution = "approximate")
+CramerV(x = kont.tafel, conf.level = 0.95)
+cramer.test(kont.tafel)
+```
+
+
+```{r }
+fisher.multcomp(kont.tafel, p.method = "holm")
+```
+
+
+```{r }
+Performance <- matrix(c(794, 86, 150, 570), nrow = 2, 
+                  dimnames = list("First" = c("Approve", "Disapprove"),
+                                  "Second" = c("Approve", "Disapprove")))
+Performance
+```
+
+
+```{r }
+mcnemar.test(Performance)
+```
+
+
+```{r }
+mh_test(as.table(Performance), distribution = "exact")
+mh_test(as.table(Performance))
+mh_test(as.table(Performance), distribution = "approximate")
+```
+
+
+```{r }
+binomDiffCI(a = 794, b = 150, c = 86, d = 570, paired = TRUE)
+```
+
+
+```{r cache=TRUE}
+binomDiffCI(a = 794, b = 150, c = 86, d = 570, paired = TRUE, method = "boot")
+```
+
+
+```{r }
+Rabbits <- array(c(0, 0, 6, 5,
+                   3, 0, 3, 6,
+                   6, 2, 0, 4,
+                   5, 6, 1, 0,
+                   2, 5, 0, 0), dim = c(2, 2, 5),
+                 dimnames = list(Delay = c("None", "1.5h"),
+                                 Response = c("Cured", "Died"),
+                                 Penicillin.Level = c("1/8", "1/4", "1/2", 
+                                                      "1", "4")))
+Rabbits
+```
+
+
+```{r }
+mantelhaen.test(Rabbits)
+mantelhaen.test(Rabbits, exact = TRUE)
+```
+
+
+```{r }
+cmh_test(as.table(Rabbits))
+cmh_test(as.table(Rabbits), distribution = "exact")
+cmh_test(as.table(Rabbits), distribution = "approximate")
+```
+
+
+## 6.3 Ordinale und quantitative Merkmale
+
+```{r }
+t.test(ITSDaten$Temperatur[-398], mu = 37.5, alternative = "greater")
+```
+
+
+```{r }
+t.test(ITSDaten$Temperatur, mu = 37.5, alternative = "greater")
+```
+
+
+```{r }
+wilcox.test(ITSDaten$Temperatur, mu = 37.5, alternative = "greater",
+            conf.int = TRUE)
+```
+
+
+```{r }
+wilcox.test(ITSDaten$Temperatur[-398], mu = 37.5, alternative = "greater",
+            conf.int = TRUE)
+```
+
+
+```{r }
+data(sleep)
+t.test(sleep$extra[1:10], mu = 0)
+t.test(sleep$extra[11:20], mu = 0)
+```
+
+
+```{r }
+t.test(sleep$extra[1:10], sleep$extra[11:20], paired = TRUE)
+```
+
+
+```{r }
+t.test(sleep$extra[1:10]-sleep$extra[11:20])
+```
+
+
+```{r }
+wilcox.test(sleep$extra[1:10], sleep$extra[11:20], paired = TRUE, 
+            conf.int = TRUE)
+```
+
+
+```{r }
+wilcox.exact(sleep$extra[1:10], sleep$extra[11:20], paired = TRUE, 
+             conf.int = TRUE)
+```
+
+
+```{r }
+## Frauen
+sd(ITSDaten$Temperatur[ITSDaten$Geschlecht == "weiblich"])
+## Männer
+sd(ITSDaten$Temperatur[ITSDaten$Geschlecht == "männlich"])
+```
+
+
+```{r }
+## Männer ohne Patient 398
+sd(ITSDaten$Temperatur[-398][ITSDaten$Geschlecht[-398] == "männlich"])
+```
+
+
+```{r }
+## mit Patient 398
+t.test(Temperatur ~ Geschlecht, data = ITSDaten)
+## ohne Patient 398
+t.test(Temperatur ~ Geschlecht, data = ITSDaten[-398,])
+```
+
+
+```{r }
+hsu.t.test(Temperatur ~ Geschlecht, data = ITSDaten[-398,])
+MKinfer::perm.t.test(Temperatur ~ Geschlecht, data = ITSDaten[-398,])
+boot.t.test(Temperatur ~ Geschlecht, data = ITSDaten[-398,])
+```
+
+
+```{r }
+AM <- tapply(ITSDaten$Temperatur[-398], ITSDaten$Geschlecht[-398], mean)
+KI <- tapply(ITSDaten$Temperatur[-398], ITSDaten$Geschlecht[-398], meanCI)
+n <- tapply(ITSDaten$Temperatur[-398], ITSDaten$Geschlecht[-398], length)
+DF <- data.frame(AM = AM, 
+                 KI.unten = c(KI$männlich$conf.int[1], 
+                             KI$weiblich$conf.int[1]),
+                 KI.oben = c(KI$männlich$conf.int[2], 
+                             KI$weiblich$conf.int[2]),
+                 Geschlecht = c("männlich", "weiblich"),
+                 n = n)
+DF$Geschlecht <- factor(DF$Geschlecht, levels = c("weiblich", "männlich"))
+DF
+```
+
+
+```{r }
+ggplot(DF, aes(x = Geschlecht, y = AM, color = Geschlecht)) +
+  scale_color_nejm() + geom_point() + geom_hline(yintercept = 37.5) +
+  geom_errorbar(aes(ymin = KI.unten, ymax = KI.oben), width = 0.2) + 
+  geom_text(aes(y = c(37.3, 37.3), label = paste("n =", n))) +
+  annotate(geom = "text", x = 1.5, y = 37.95, 
+           label = "Welch t-Test, p-Wert = 0.211") +
+  ylab("Maximale Körpertemperatur [°C]") + ylim(37.0, 38.0)
+```
+
+
+```{r }
+## ohne Patient 398
+wilcox.test(Temperatur ~ Geschlecht, data = ITSDaten[-398,],
+            conf.int = TRUE)
+## mit Patient 398
+wilcox.test(Temperatur ~ Geschlecht, data = ITSDaten, conf.int = TRUE)
+wilcox_test(Temperatur ~ factor(Geschlecht), data = ITSDaten, conf.int = TRUE,
+            distribution = "approximate")
+wilcox.exact(Temperatur ~ Geschlecht, data = ITSDaten, conf.int = TRUE)
+```
+
+
+```{r }
+ggplot(data = ITSDaten, aes(x = factor(Geschlecht, levels = c("weiblich", 
+                                                              "männlich")), 
+                            y = Temperatur, 
+                            fill = factor(Geschlecht, levels = c("weiblich", 
+                                                              "männlich")))) +
+  geom_hline(yintercept = 37.5) + scale_fill_nejm(name = "Geschlecht") +
+  geom_boxplot() + stat_compare_means(label.y = 42.4, label.x = 1.35) + 
+  ylab("Maximale Körpertemperatur [°C]") + ylim(32, 42.5) + 
+  annotate(geom = "text", x = c(1, 2), y = c(32.7, 32.7), 
+           label = c("n = 175", "n = 325"), color = pal_nejm()(2)) +
+  xlab("Geschlecht")
+```
+
+
+```{r }
+## mit Patient 398, klassisch
+oneway.test(Temperatur ~ Ergebnis, data = ITSDaten, var.equal = TRUE)
+## mit Patient 398, Welch
+oneway.test(Temperatur ~ Ergebnis, data = ITSDaten)
+## ohne Patient 398, klassisch
+oneway.test(Temperatur ~ Ergebnis, data = ITSDaten[-398,], var.equal = TRUE)
+## ohne Patient 398, Welch
+oneway.test(Temperatur ~ Ergebnis, data = ITSDaten[-398,])
+```
+
+
+```{r }
+## mit Patient 398
+kruskal.test(Temperatur ~ Ergebnis, data = ITSDaten)
+## ohne Patient 398
+kruskal.test(Temperatur ~ Ergebnis, data = ITSDaten[-398,])
+```
+
+
+```{r }
+kruskal_test(Temperatur ~ factor(Ergebnis), data = ITSDaten, 
+             distribution = "approximate")
+```
+
+
+```{r }
+## paarweise Welch t-Tests ohne Patient 398
+pairwise.t.test(ITSDaten$Temperatur[-398], ITSDaten$Ergebnis[-398],
+                pool.sd = FALSE)
+## paarweise Wilcoxon-Mann-Whitney U-Tests
+pairwise.wilcox.test(ITSDaten$Temperatur, ITSDaten$Ergebnis)
+```
+
+
+```{r }
+## Mittelwerte und SDs
+tapply(ITSDaten$Temperatur[-398], ITSDaten$Ergebnis[-398], mean)
+tapply(ITSDaten$Temperatur[-398], ITSDaten$Ergebnis[-398], sd)
+## Hodges-Lehmann Schätzer
+pairwise.fun(ITSDaten$Temperatur[-398], ITSDaten$Ergebnis[-398], 
+             function(x, y) wilcox.test(x, y, conf.int = TRUE)$estimate)
+```
+
+
+```{r }
+AM <- tapply(ITSDaten$Temperatur[-398], ITSDaten$Ergebnis[-398], mean)
+KI <- tapply(ITSDaten$Temperatur[-398], ITSDaten$Ergebnis[-398], meanCI)
+n <- tapply(ITSDaten$Temperatur[-398], ITSDaten$Ergebnis[-398], length)
+DF <- data.frame(AM = AM, 
+                 KI.unten = c(KI$`anderes KH`$conf.int[1], 
+                              KI$`nach Hause`$conf.int[1],
+                              KI$`Pflege/REHA`$conf.int[1],
+                              KI$Verstorben$conf.int[1]),
+                 KI.oben = c(KI$`anderes KH`$conf.int[2], 
+                              KI$`nach Hause`$conf.int[2],
+                              KI$`Pflege/REHA`$conf.int[2],
+                              KI$Verstorben$conf.int[2]),
+                 Ergebnis = names(KI),
+                 n = n)
+DF$Ergebnis <- factor(DF$Ergebnis, levels = c("nach Hause", "Pflege/REHA",
+                                              "anderes KH", "Verstorben"))
+DF
+```
+
+
+```{r }
+ggplot(DF, aes(x = Ergebnis, y = AM, color = Ergebnis)) +
+  scale_color_npg() + geom_point() + geom_hline(yintercept = 37.5) +
+  geom_errorbar(aes(ymin = KI.unten, ymax = KI.oben), width = 0.2) + 
+  geom_text(aes(y = rep(37.1, 4), label = paste("n =", n))) +
+  annotate(geom = "text", x = 2.5, y = 38.4, 
+           label = "Welch 1-Weg ANOVA, p-Wert = 0.001") +
+  ylab("Maximale Körpertemperatur [°C]") + ylim(37.0, 38.5)
+```
+
+
+```{r }
+ITStmp <- ITSDaten[,c("Ergebnis", "Temperatur")]
+ITStmp$Ergebnis <- factor(ITStmp$Ergebnis, levels = c("nach Hause", 
+                                                      "Pflege/REHA",
+                                                      "anderes KH", 
+                                                      "Verstorben"))
+vergleiche<- list(c("nach Hause", "Pflege/REHA"),
+                  c("Pflege/REHA", "anderes KH"),
+                  c("anderes KH", "Verstorben"),
+                  c("nach Hause", "anderes KH"),
+                  c("nach Hause", "Verstorben"),
+                  c("Pflege/REHA", "Verstorben"))
+ggplot(data=ITStmp, aes(x=Ergebnis, y=Temperatur, fill=Ergebnis)) +
+  geom_hline(yintercept = 37.5) + geom_boxplot() + 
+  stat_compare_means(label.y = 43, label.x = 2.0) +
+  ggtitle("Maximale Körpertemperatur in Abhängigkeit vom Ergebnis") +
+  ylim(c(33, 43))
+```
+
+
+```{r }
+data(selfesteem)
+selfesteem
+```
+
+
+```{r }
+SE.lang <- data.frame(id = rep(selfesteem$id, 3),
+                      Score = c(selfesteem$t1, selfesteem$t2, 
+                                selfesteem$t3),
+                      Zeitpunkt = rep(c("t1", "t2", "t3"), each = 10))
+## Klassische repeated-measures 1-Weg ANOVA
+rm.oneway.test(x = SE.lang$Score, g = SE.lang$Zeitpunkt, id = SE.lang$id)
+## Mixed-effects 1-Weg ANOVA
+rm.oneway.test(x = SE.lang$Score, g = SE.lang$Zeitpunkt, id = SE.lang$id, 
+               method = "lme")
+## Quade-Test
+rm.oneway.test(x = SE.lang$Score, g = SE.lang$Zeitpunkt, id = SE.lang$id,
+               method = "quade")
+## Friedman-Test
+rm.oneway.test(x = SE.lang$Score, g = SE.lang$Zeitpunkt, id = SE.lang$id,
+               method = "friedman")
+```
+
+
+```{r }
+## Paarweise gepaarte t-Tests
+pairwise.t.test(SE.lang$Score, SE.lang$Zeitpunkt, paired = TRUE)
+## Paarweise Wilcoxon Vorzeichenrangtests
+pairwise.wilcox.test(SE.lang$Score, SE.lang$Zeitpunkt, paired = TRUE)
+```
+
+
+```{r }
+## Mittelwerte
+pairwise.fun(SE.lang$Score, SE.lang$Zeitpunkt, function(x, y) mean(x-y))
+## SDs
+pairwise.fun(SE.lang$Score, SE.lang$Zeitpunkt, function(x, y) sd(x-y))
+## Mediane
+pairwise.fun(SE.lang$Score, SE.lang$Zeitpunkt, function(x, y) median(x-y))
+```
+
+
+```{r fig.width = 12, fig.height = 9}
+gg1 <- ggpaired(data = selfesteem, cond1 = "t1", cond2 = "t2", 
+         fill = "condition") + ylim(1, 10.5) +
+  scale_fill_manual(values = pal_jama()(3)[1:2]) +
+  annotate(geom = "text", x = 1.5, y = 10.5, 
+           label = "Wilcoxon Vorzeichenrangtest, adj. p = 0.006") +
+  annotate(geom = "text", x = 1.5, y = 10, 
+           label = "Gepaarter t-Test, adj. p = 0.002")
+gg2 <- ggpaired(data = selfesteem, cond1 = "t1", cond2 = "t3", 
+         fill = "condition") + ylim(1, 10.5) +
+  scale_fill_manual(values = pal_jama()(3)[c(1,3)]) + 
+  annotate(geom = "text", x = 1.5, y = 10.5, 
+           label = "Wilcoxon Vorzeichenrangtest, adj. p = 0.006") +
+  annotate(geom = "text", x = 1.5, y = 10, 
+           label = "Gepaarter t-Test, adj. p < 0.001")
+gg3 <- ggpaired(data = selfesteem, cond1 = "t2", cond2 = "t3", 
+         fill = "condition") + ylim(1, 10.5) +
+  scale_fill_manual(values = pal_jama()(3)[c(2,3)]) + 
+  annotate(geom = "text", x = 1.5, y = 10.5, 
+           label = "Wilcoxon Vorzeichenrangtest, adj. p = 0.006") +
+  annotate(geom = "text", x = 1.5, y = 10, 
+           label = "Gepaarter t-Test, adj. p = 0.002")
+grid.arrange(gg1, gg2, gg3, nrow = 1)
+```
+
+
+```{r }
+## mit Patient 398
+var.test(Temperatur ~ Geschlecht, data = ITSDaten)
+## ohne Patient 398
+var.test(Temperatur ~ Geschlecht, data = ITSDaten[-398,])
+```
+
+
+```{r }
+ITStmp <- ITSDaten[,c("Temperatur", "Geschlecht")]
+tapply(ITStmp$Temperatur, ITStmp$Geschlecht, median)
+Mann <- ITStmp$Geschlecht == "männlich"
+ITStmp$Temperatur[Mann] <- ITStmp$Temperatur[Mann] - 37.8
+ITStmp$Temperatur[!Mann] <- ITStmp$Temperatur[!Mann] - 37.5
+ansari.test(Temperatur ~ Geschlecht, data = ITStmp, conf.int = TRUE)
+ansari.test(Temperatur ~ Geschlecht, data = ITStmp[-398,], conf.int = TRUE)
+```
+
+
+```{r }
+## Pearson ohne Patient 398
+cor.test(ITSDaten$Temperatur[-398], ITSDaten$Herzfrequenz[-398])
+## Spearman
+cor.test(ITSDaten$Temperatur, ITSDaten$Herzfrequenz, method = "spearman")
+## Kendall
+cor.test(ITSDaten$Temperatur, ITSDaten$Herzfrequenz, method = "kendall")
+```
+
+
+```{r }
+SpearmanRho(ITSDaten$Temperatur, ITSDaten$Herzfrequenz, conf.level = 0.95)
+kendall.ci(ITSDaten$Temperatur, ITSDaten$Herzfrequenz)
+```
+
+
+```{r }
+## Shapiro-Wilk Test
+shapiro.test(ITSDaten$Temperatur[-398])
+## Lilliefors (Kolmogorov-Smirnov) Test
+LillieTest(ITSDaten$Temperatur[-398])
+## Cramer-von Mises Test
+CramerVonMisesTest(ITSDaten$Temperatur[-398])
+## Shapiro-Francia Test
+ShapiroFranciaTest(ITSDaten$Temperatur[-398])
+```
