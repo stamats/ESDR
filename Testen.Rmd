@@ -522,8 +522,22 @@ cor.test(ITSDaten$Temperatur, ITSDaten$Herzfrequenz, method = "kendall")
 
 
 ```{r }
+## Spearman
 SpearmanRho(ITSDaten$Temperatur, ITSDaten$Herzfrequenz, conf.level = 0.95)
+## Kendall
 kendall.ci(ITSDaten$Temperatur, ITSDaten$Herzfrequenz)
+```
+
+
+```{r }
+## Pearson
+cor.test(ITSDaten$Temperatur[-398], ITSDaten$Herzfrequenz[-398], 
+         alternative = "less", conf.level = 0.99)$conf.int
+## Spearman
+SpearmanRho(ITSDaten$Temperatur, ITSDaten$Herzfrequenz, conf.level = 0.98)
+## Kendall
+kendall.ci(ITSDaten$Temperatur, ITSDaten$Herzfrequenz, type = "u", 
+           alpha = 0.01)
 ```
 
 
