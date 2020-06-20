@@ -409,12 +409,6 @@ ITStmp$Ergebnis <- factor(ITStmp$Ergebnis, levels = c("nach Hause",
                                                       "Pflege/REHA",
                                                       "anderes KH", 
                                                       "Verstorben"))
-vergleiche<- list(c("nach Hause", "Pflege/REHA"),
-                  c("Pflege/REHA", "anderes KH"),
-                  c("anderes KH", "Verstorben"),
-                  c("nach Hause", "anderes KH"),
-                  c("nach Hause", "Verstorben"),
-                  c("Pflege/REHA", "Verstorben"))
 ggplot(data=ITStmp, aes(x=Ergebnis, y=Temperatur, fill=Ergebnis)) +
   geom_hline(yintercept = 37.5) + geom_boxplot() + 
   stat_compare_means(label.y = 43, label.x = 2.0) +
