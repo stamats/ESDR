@@ -1,0 +1,187 @@
+---
+title: "Kapitel 7: Multiples Testen"
+author: "Matthias Kohl"
+date: "Juli 2020"
+output:
+  rmarkdown::html_document:
+    theme: united
+    highlight: tango
+    toc: true
+---
+
+```{r eval=FALSE}
+BiocManager::install("multtest", update = FALSE)
+BiocManager::install("limma", update = FALSE)
+install.packages("MKomics")
+```
+
+
+```{r message=FALSE}
+library(DescTools)
+library(ggplot2)
+library(MKdescr)
+library(RColorBrewer)
+library(ggsci)
+library(distr)
+library(distr6)
+library(distrMod)
+library(qqplotr)
+library(RobLox)
+library(MKinfer)
+library(ROptEst)
+library(RobExtremes)
+library(MKpower)
+library(RVAideMemoire)
+library(coin)
+library(exactRankTests)
+library(ggpubr)
+library(datarium)
+library(gridExtra)
+library(NSM3)
+library(multtest)
+library(MKomics)
+```
+
+## 7.1 Einführung
+
+## 7.2 Family-wise Error Rate (FWER)
+
+```{r FWER}
+N <- 1:150
+FWER <- 100*(1 - (1-0.05)^N)
+DF <- data.frame(N = N, FWER = FWER)
+ggplot(DF, aes(x = N, y = FWER)) + 
+  geom_point() + geom_line() + xlab("Anzahl an Tests") + ylab("FWER [%]") + 
+  ggtitle("FWER unter der Annahme von unabhängigen Tests")
+```
+
+
+```{r }
+round(DF[c(1,2,3,5,10,14,45,59,90),], 1)
+```
+
+
+```{r }
+pval <- c(0.004, 0.011, 0.039, 0.012, 0.001, 0.480)
+p.adjust(pval, method = "bonferroni")
+```
+
+
+```{r }
+## Sortierung nicht nötig
+p.adjust(pval, method = "holm")
+```
+
+
+```{r }
+## Sortieren nicht nötig
+p.adjust(pval, method = "hochberg")
+```
+
+
+```{r }
+## Endpunkt 1
+power.welch.t.test(delta = 0.5, sd1 = 1.0, sd2 = 1.2, 
+                   sig.level = 0.05/3, power = 0.9)
+## Endpunkt 2
+power.welch.t.test(delta = 0.75, sd1 = 1.5, sd2 = 1.2, 
+                   sig.level = 0.05/3, power = 0.9)
+## Endpunkt 3
+power.welch.t.test(delta = 1.0, sd1 = 1.5, sd2 = 1.75, 
+                   sig.level = 0.05/3, power = 0.9)
+```
+
+
+```{r }
+## Endpunkt 2
+power.welch.t.test(delta = 0.75, sd1 = 1.5, sd2 = 1.2, 
+                   sig.level = 0.05/3, n = 134)
+## Endpunkt 3
+power.welch.t.test(delta = 1.0, sd1 = 1.5, sd2 = 1.75, 
+                   sig.level = 0.05/3, n = 134)
+```
+
+
+## 7.3 False Discovery Rate (FDR)
+
+```{r FDR}
+## Sortieren nicht nötig
+p.adjust(pval, method = "fdr")
+```
+
+
+```{r }
+data(golub)
+str(golub)
+```
+
+
+```{r }
+golub.cl <- factor(golub.cl, labels = c("ALL", "AML"))
+table(golub.cl)
+```
+
+
+```{r }
+ttest <- function(x, g) t.test(x~g)[["p.value"]]
+p.werte <- apply(X = golub, MARGIN = 1, FUN = ttest, g = golub.cl)
+```
+
+
+```{r }
+hist(p.werte, nclass = 101, 
+     main = "Histogram der (unadjustierten) p Werte")
+```
+
+
+```{r }
+M <- matrix(rnorm(nrow(golub)*ncol(golub)), nrow = nrow(golub))
+p.werte.vgl <- apply(M, 1, ttest, g = golub.cl)
+```
+
+
+```{r }
+par(mfrow = c(2, 1))
+hist(p.werte, nclass = 101, xlab = "p Wert", main = "Golub Daten")
+abline(h = 30.2)
+hist(p.werte.vgl, nclass = 101, xlab = "p Wert", 
+     main = "Zufallszahlen mit keinem Gruppenunterschied")
+abline(h = 30.2)
+```
+
+
+```{r }
+## zu erwartende Anzahl
+0.05*nrow(M)
+## tatsächliche Anzahl
+sum(p.werte.vgl < 0.05)
+```
+
+
+```{r }
+sum(p.werte < 0.05)
+```
+
+
+```{r }
+p.werte.adj <- mt.rawp2adjp(p.werte)
+```
+
+
+```{r }
+colSums(p.werte.adj[["adjp"]] < 0.05)
+```
+
+
+```{r }
+logFC <- apply(golub, 1, pairwise.logfc, g = golub.cl)
+```
+
+
+```{r }
+volcano(x = logFC, pval = p.werte.adj[["adjp"]][,"BH"], effect.low = -log10(2),
+        effect.high = log10(2), alpha = 0.3, 
+        xlab = expression(paste(log[10], "-fache Veränderung")), 
+        ylab = expression(paste(-log[10], "(adj. p Wert)")), 
+        title = "Vulkanplot")
+```
