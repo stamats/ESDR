@@ -253,7 +253,7 @@ normCI(ITSDaten$Temperatur[-398])
 
 
 ```{r}
-normCI(ITSDaten$Temperatur[-398], boot = TRUE, bootci.type = "bca")
+normCI(ITSDaten$Temperatur[-398], boot = TRUE)
 ```
 
 
@@ -434,6 +434,10 @@ library(MKpower)
 ssize.propCI(0.5, width = 0.062, method = "wald")
 ## mit Stetigkeitskorrektur
 ssize.propCI(0.5, width = 0.062, method = "wald-cc")
+## Clopper-Pearson
+ssize.propCI(0.5, width = 0.062, method = "clopper-pearson")
+## Agresti-Coull
+ssize.propCI(0.5, width = 0.062, method = "agresti-coull")
 ```
 
 
