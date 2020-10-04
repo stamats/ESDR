@@ -1,7 +1,7 @@
 ---
 title: "Kapitel 4: Wahrscheinlichkeitsverteilungen"
 author: "Matthias Kohl"
-date: "April 2020"
+date: "Oktober 2020"
 output:
   rmarkdown::html_document:
     theme: united
