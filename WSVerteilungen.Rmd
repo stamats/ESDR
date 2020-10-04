@@ -17,6 +17,7 @@ install.packages(c("distr", "distr6"))
 
 ```{r}
 library(DescTools)
+library(scales)
 library(ggplot2)
 library(MKdescr)
 library(RColorBrewer)
@@ -70,7 +71,6 @@ rbinom(10, size = 50, prob = 0.09)
 
 
 ```{r}
-library(distr)
 X <- Binom(size = 20, prob = 0.01)
 ```
 
@@ -81,7 +81,6 @@ plot(X)
 
 
 ```{r}
-library(distr6)
 X6 <- Binomial$new(prob = 0.09, size = 50)
 ```
 
