@@ -39,12 +39,13 @@ str(ITSDaten)
 ## 2.4 Exkurs: Erweiterungspakete installieren
 
 ```{r, eval=FALSE}
-install.packages(c("DescTools", "ggplot2", "MKdescr"))
+install.packages(c("DescTools", "scales", "ggplot2", "MKdescr"))
 ```
 
 
 ```{r}
 library(DescTools)
+library(scales)
 library(ggplot2)
 library(MKdescr)
 ```
@@ -64,7 +65,6 @@ table(ITSDaten$OP)/nrow(ITSDaten)
 
 
 ```{r}
-library(DescTools)
 Freq(ITSDaten$OP)
 ```
 
@@ -81,8 +81,6 @@ barplot(table(ITSDaten$OP), main = "Operationsarten",
 
 
 ```{r, fig.width=9}
-library(ggplot2)
-library(scales)
 ## Anlegen der Daten
 ggplot(ITSDaten, aes(x=OP)) +
   ## Hinzufügen der Balken für die relativen Häufigkeiten
@@ -100,8 +98,7 @@ pie(table(ITSDaten$OP), main = "Operationsarten")
 
 
 ```{r}
-ceiling(2.01)
-ceiling(3.88)
+ceiling(c(2.01, 3.88))
 ```
 
 
@@ -147,7 +144,6 @@ mad(ITSDaten$SAPS.II)
 
 
 ```{r}
-library(MKdescr)
 sIQR(ITSDaten$SAPS.II)
 ```
 
@@ -229,12 +225,12 @@ table(ITSDaten$Geschlecht, ITSDaten$OP)
 
 
 ```{r}
-prop.table(table(ITSDaten$Geschlecht, ITSDaten$OP), margin = 1)
+proportions(table(ITSDaten$Geschlecht, ITSDaten$OP), margin = 1)
 ```
 
 
 ```{r}
-round(100*prop.table(table(ITSDaten$Geschlecht, ITSDaten$OP), margin = 1), 1)
+round(100*proportions(table(ITSDaten$Geschlecht, ITSDaten$OP), margin = 1), 1)
 ```
 
 
@@ -268,11 +264,6 @@ ggplot(ITSDaten, aes(x = OP, fill = Geschlecht)) +
   scale_y_continuous(labels = percent_format(accuracy = 1)) +
   ylab("Relative Häufigkeit [%]") + xlab("Art der OP") +
   ggtitle("Geschlecht und Art der OP")
-```
-
-
-```{r}
-tapply(ITSDaten$OP, ITSDaten$Geschlecht, table)
 ```
 
 
@@ -401,6 +392,11 @@ Skew(ITSDaten$LOS)
 ```{r}
 Kurt(ITSDaten$Temperatur)
 Kurt(ITSDaten$Temperatur[-398])
+```
+
+
+```{r}
+Kurt(ITSDaten$LOS)
 ```
 
 
@@ -546,3 +542,7 @@ cor(ITSDaten$Temperatur, ITSDaten$Herzfrequenz, method = "kendall")
 cor(ITSDaten$Temperatur[-398], ITSDaten$Herzfrequenz[-398], method = "kendall")
 ```
 
+
+```{r }
+cor(rank(ITSDaten$Temperatur), rank(ITSDaten$Herzfrequenz))
+```
