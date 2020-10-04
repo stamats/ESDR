@@ -1,7 +1,7 @@
 ---
 title: "Kapitel 5: Schätzen"
 author: "Matthias Kohl"
-date: "Mai 2020"
+date: "Oktober 2020"
 output:
   rmarkdown::html_document:
     theme: united
@@ -17,12 +17,13 @@ BiocManager::install("Biobase", update = FALSE)
 
 ```{r, eval=FALSE}
 install.packages(c("distrMod", "qqplotr", "RobLox", "MKinfer", 
-                   "ROptEst", "RobExtremes", "MKpower"))
+                   "ROptEst", "RobExtremes", "MKpower", "MKclass"))
 ```
 
 
 ```{r}
 library(DescTools)
+library(scales)
 library(ggplot2)
 library(MKdescr)
 library(RColorBrewer)
@@ -36,6 +37,9 @@ library(MKinfer)
 library(ROptEst)
 library(RobExtremes)
 library(MKpower)
+library(MKclass)
+library(MASS)
+library(boot)
 ```
 
 
@@ -64,13 +68,11 @@ pnorm(10, mean = 37.7, sd = 1.2)
 
 
 ```{r}
-library(MASS)
 fitdistr(ITSDaten$Temperatur[-398], densfun = "normal")
 ```
 
 
 ```{r}
-library(distrMod)
 ## Ausgabeoption ändern
 distrModOptions(show.details = "minimal")
 ## Anlegen des Modells
@@ -103,8 +105,6 @@ ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
 
 
 ```{r}
-library(ggplot2)
-library(qqplotr)
 ggplot(ITSDaten[-398,], aes(sample = Temperatur)) + 
   qqplotr::stat_pp_band(dparams = list(mean = 37.7, sd = 1.2)) + 
   qqplotr::stat_pp_point(dparams = list(mean = 37.7, sd = 1.2)) + 
@@ -171,7 +171,6 @@ for(i in 1:9){
 
 
 ```{r}
-library(MKdescr)
 median(ITSDaten$Temperatur)
 mad(ITSDaten$Temperatur)
 sIQR(ITSDaten$Temperatur)
@@ -200,15 +199,113 @@ KolmogorovMDEstimator(ITSDaten$Temperatur, Modell)
 
 
 ```{r}
-library(RobLox)
 roblox(ITSDaten$Temperatur, eps.lower = 1/500, eps.upper = 0.05, k = 3)
+```
+
+
+```{r }
+qnorm(0.95)
+```
+
+
+```{r }
+pnorm(3.3)
+```
+
+
+```{r }
+Bili <- round(ITSDaten$Bilirubin, 1)
+```
+
+
+```{r }
+quantile(Bili[ITSDaten$Leberversagen == 0], probs = 0.95)
+perfMeasures(pred = Bili, truth = ITSDaten$Leberversagen, 
+             namePos = 1, cutoff = 49.615, measures = c("SENS", "SPEC"))
+```
+
+
+```{r }
+mean(log(Bili[ITSDaten$Leberversagen == 0]))
+sd(log(Bili[ITSDaten$Leberversagen == 0]))
+qlnorm(0.95, meanlog = 2.774, sdlog = 0.604)
+perfMeasures(pred = Bili, truth = ITSDaten$Leberversagen, 
+             namePos = 1, cutoff = 43.27, measures = c("SENS", "SPEC"))
+```
+
+
+```{r }
+optCutoff(pred = Bili, truth = ITSDaten$Leberversagen, namePos = 1)
+optCutoff(pred = Bili, truth = ITSDaten$Leberversagen, 
+          namePos = 1, perfMeasure = "BACC")
+perfMeasures(pred = Bili, truth = ITSDaten$Leberversagen, 
+             namePos = 1, cutoff = 28.4, measures = c("SENS", "SPEC"))
+```
+
+
+```{r cache = TRUE}
+B <- 1000
+n0 <- sum(ITSDaten$Leberversagen == 0)
+ind0 <- which(ITSDaten$Leberversagen == 0)
+n1 <- sum(ITSDaten$Leberversagen == 1)
+ind1 <- which(ITSDaten$Leberversagen == 1)
+cutoffs <- numeric(B)
+for(i in 1:B){
+  auswahl0 <- sample(ind0, n0, replace = TRUE)
+  auswahl1 <- sample(ind1, n1, replace = TRUE)
+  BS.data <- ITSDaten[c(auswahl0, auswahl1),]
+  cutoffs[i] <- optCutoff(pred = round(BS.data$Bilirubin, 1), 
+                          truth = BS.data$Leberversagen, 
+                          namePos = 1)[1]
+}
+summary(cutoffs)
+```
+
+
+```{r }
+perfMeasures(pred = Bili, truth = ITSDaten$Leberversagen, 
+             namePos = 1, cutoff = mean(cutoffs), 
+             measures = c("SENS", "SPEC"))
+```
+
+
+```{r }
+## Mehr Gewicht auf Sensitivität
+optCutoff(pred = Bili, truth = ITSDaten$Leberversagen, 
+          namePos = 1, perfMeasure = "WACC", wACC = 0.75)
+perfMeasures(pred = Bili, truth = ITSDaten$Leberversagen, 
+             namePos = 1, cutoff = 17.7, measures = c("SENS", "SPEC"))
+## Mehr Gewicht auf Spezifität
+optCutoff(pred = Bili, truth = ITSDaten$Leberversagen, 
+          namePos = 1, perfMeasure = "WACC", wACC = 0.25)
+perfMeasures(pred = Bili, truth = ITSDaten$Leberversagen, 
+             namePos = 1, cutoff = 53.3, measures = c("SENS", "SPEC"))
+```
+
+
+```{r }
+stump <- decisionStump(pred = Bili, truth = ITSDaten$Leberversagen, 
+                       namePos = 1)
+stump
+```
+
+
+```{r }
+predict(stump, newdata = c(4.3, 10.1, 17.4, 28.4, 28.5, 71.0, 93.1))
+```
+
+
+```{r }
+perfScores(pred = Bili, truth = ITSDaten$Leberversagen, namePos = 1, 
+           scores = "AUC")
+perfScores(pred = Bili, truth = ITSDaten$Leberversagen, namePos = 1, 
+           scores = c("AUC", "BS"), transform = TRUE)
 ```
 
 
 ## 5.2 Konfidenzintervalle
 
 ```{r}
-library(MKinfer)
 meanCI(ITSDaten$Temperatur[-398])
 ```
 
@@ -225,7 +322,6 @@ qnorm(1-0.05/2)
 
 
 ```{r}
-library(MASS)
 ## ML-Schätzer
 ML <- fitdistr(ITSDaten$Temperatur[-398], densfun = "normal")
 ## Approximatives Konfidenzintervall
@@ -234,7 +330,6 @@ confint(ML)
 
 
 ```{r}
-library(distrMod)
 ## Modell
 Modell <- NormLocationScaleFamily()
 ## ML-Schäter
@@ -338,7 +433,6 @@ confint(MDp)
 
 
 ```{r}
-library(boot)
 ## x: Vektor der Beobachtungen
 ## i: Vektor der Indizes der Bootstrap-Stichprobe
 KSMDEst <- function(x, i){
@@ -389,7 +483,6 @@ boot.ci(boot.out, index = c(2,4))
 
 
 ```{r}
-library(ROptEst)
 Modell <- BinomFamily(size = 1)
 ALest <- roptest(ITSDaten$Leberversagen, Modell,
                  eps.lower = 0, eps.upper = 0.02, steps = 3)
@@ -429,7 +522,6 @@ ggplot(DF, aes(x = n, y = maxFehler)) + geom_line() + ylab("Prozent [%]") +
 
 
 ```{r}
-library(MKpower)
 ## ohne Stetigkeitskorrektur
 ssize.propCI(0.5, width = 0.062, method = "wald")
 ## mit Stetigkeitskorrektur
