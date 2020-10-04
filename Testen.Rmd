@@ -1,7 +1,7 @@
 ---
 title: "Kapitel 6: Statistische Hypothesentests"
 author: "Matthias Kohl"
-date: "Mai 2020"
+date: "Oktober 2020"
 output:
   rmarkdown::html_document:
     theme: united
@@ -18,6 +18,7 @@ install.packages(c("RVAideMemoire", "coin", "exactRankTests",
 
 ```{r message=FALSE}
 library(DescTools)
+library(scales)
 library(ggplot2)
 library(MKdescr)
 library(RColorBrewer)
@@ -31,6 +32,9 @@ library(MKinfer)
 library(ROptEst)
 library(RobExtremes)
 library(MKpower)
+library(MKclass)
+library(MASS)
+library(boot)
 library(RVAideMemoire)
 library(coin)
 library(exactRankTests)
@@ -428,6 +432,12 @@ SE.lang <- data.frame(id = rep(selfesteem$id, 3),
                       Score = c(selfesteem$t1, selfesteem$t2, 
                                 selfesteem$t3),
                       Zeitpunkt = rep(c("t1", "t2", "t3"), each = 10))
+head(SE.lang)
+tail(SE.lang)
+```
+
+
+```{r }
 ## Klassische repeated-measures 1-Weg ANOVA
 rm.oneway.test(x = SE.lang$Score, g = SE.lang$Zeitpunkt, id = SE.lang$id)
 ## Mixed-effects 1-Weg ANOVA
@@ -524,11 +534,18 @@ kendall.ci(ITSDaten$Temperatur, ITSDaten$Herzfrequenz)
 
 
 ```{r }
+cor.test(rank(ITSDaten$Temperatur), rank(ITSDaten$Herzfrequenz))
+```
+
+
+```{r }
 ## Pearson
 cor.test(ITSDaten$Temperatur[-398], ITSDaten$Herzfrequenz[-398], 
          alternative = "less", conf.level = 0.99)$conf.int
 ## Spearman
 SpearmanRho(ITSDaten$Temperatur, ITSDaten$Herzfrequenz, conf.level = 0.98)
+cor.test(rank(ITSDaten$Temperatur), rank(ITSDaten$Herzfrequenz), 
+         alternative = "less", conf.level = 0.99)$conf.int
 ## Kendall
 kendall.ci(ITSDaten$Temperatur, ITSDaten$Herzfrequenz, type = "u", 
            alpha = 0.01)
