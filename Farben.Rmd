@@ -16,6 +16,7 @@ install.packages(c("RColorBrewer", "ggsci"))
 
 ```{r}
 library(DescTools)
+library(scales)
 library(ggplot2)
 library(MKdescr)
 library(RColorBrewer)
@@ -26,7 +27,6 @@ library(ggsci)
 ## 3.1 Farben
 
 ```{r}
-library(RColorBrewer)
 display.brewer.all(type = "qual")
 ```
 
@@ -66,7 +66,6 @@ barplot(table(ITSDaten$OP), main = "Operationsarten",
 
 
 ```{r, fig.width=9}
-library(ggsci)
 ## Anlegen der Daten
 ggplot(ITSDaten, aes(x=OP)) +
   ## Hinzufügen der Balken für die relativen Häufigkeiten
