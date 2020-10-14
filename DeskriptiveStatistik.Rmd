@@ -21,7 +21,7 @@ ITSDaten <- read.csv2(file = "ITSDaten.csv", fileEncoding = "utf8")
 
 
 ```{r}
-Link <- "https://github.com/stamats/ESDR/blob/master/ITSDaten.csv"
+Link <- "https://raw.githubusercontent.com/stamats/ESDR/master/DeskriptiveStatistik.Rmd"
 ITSDaten <- read.csv2(file = Link, fileEncoding = "utf8")
 ```
 
