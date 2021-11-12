@@ -111,7 +111,7 @@ ggplot(ITSDaten[-398,], aes(sample = Temperatur)) +
   qqplotr::stat_pp_line() + 
   xlab("Modell für Maximale Körpertemperatur") + 
   ylab("Beobachtete Maximale Körpertemperatur") + 
-  ggtitle("qq-Plot für Norm(37.7, 1.2)")
+  ggtitle("pp-Plot für Norm(37.7, 1.2)")
 ```
 
 
