@@ -1,7 +1,7 @@
 ---
 title: "Kapitel 4: Wahrscheinlichkeitsverteilungen"
 author: "Matthias Kohl"
-date: "Oktober 2020"
+date: "Oktober 2022"
 output:
   rmarkdown::html_document:
     theme: united
@@ -11,17 +11,26 @@ output:
 
 
 ```{r eval=FALSE}
-install.packages(c("distr", "distr6"))
+install.packages("distr")
+```
+
+
+```{r eval=FALSE}
+# Füge Repository raphaels1 hinzu
+options(repos = c(raphaels1 = "https://raphaels1.r-universe.dev",
+                  CRAN = "https://cloud.r-project.org"))
+# Installiere distr6
+install.packages("distr6")
+```
+
+
+```{r eval=FALSE}
+install.packages("remotes")
+remotes::install_github("alan-turing-institute/distr6")
 ```
 
 
 ```{r}
-library(DescTools)
-library(scales)
-library(ggplot2)
-library(MKdescr)
-library(RColorBrewer)
-library(ggsci)
 library(distr)
 library(distr6)
 ```
