@@ -1,7 +1,7 @@
 ---
 title: "Kapitel 3: Farben und Diagramme"
 author: "Matthias Kohl"
-date: "Oktober 2020"
+date: "Oktober 2022"
 output:
   rmarkdown::html_document:
     theme: united
@@ -15,10 +15,7 @@ install.packages(c("RColorBrewer", "ggsci"))
 
 
 ```{r}
-library(DescTools)
-library(scales)
 library(ggplot2)
-library(MKdescr)
 library(RColorBrewer)
 library(ggsci)
 ```
@@ -54,6 +51,7 @@ rgb(red = 228, green = 26, blue = 28, maxColorValue = 255)
 
 
 ```{r}
+str(colors())
 col2rgb("royalblue")
 ```
 
