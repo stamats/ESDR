@@ -22,14 +22,8 @@ install.packages(c("distrMod", "qqplotr", "RobLox", "MKinfer",
 
 
 ```{r}
-library(DescTools)
-library(scales)
 library(ggplot2)
 library(MKdescr)
-library(RColorBrewer)
-library(ggsci)
-library(distr)
-library(distr6)
 library(distrMod)
 library(qqplotr)
 library(RobLox)
@@ -203,29 +197,29 @@ roblox(ITSDaten$Temperatur, eps.lower = 1/500, eps.upper = 0.05, k = 3)
 ```
 
 
-```{r }
+```{r}
 qnorm(0.95)
 ```
 
 
-```{r }
+```{r}
 pnorm(3.3)
 ```
 
 
-```{r }
+```{r}
 Bili <- round(ITSDaten$Bilirubin, 1)
 ```
 
 
-```{r }
+```{r}
 quantile(Bili[ITSDaten$Leberversagen == 0], probs = 0.95)
 perfMeasures(pred = Bili, truth = ITSDaten$Leberversagen, 
              namePos = 1, cutoff = 49.615, measures = c("SENS", "SPEC"))
 ```
 
 
-```{r }
+```{r}
 mean(log(Bili[ITSDaten$Leberversagen == 0]))
 sd(log(Bili[ITSDaten$Leberversagen == 0]))
 qlnorm(0.95, meanlog = 2.774, sdlog = 0.604)
@@ -234,7 +228,7 @@ perfMeasures(pred = Bili, truth = ITSDaten$Leberversagen,
 ```
 
 
-```{r }
+```{r}
 optCutoff(pred = Bili, truth = ITSDaten$Leberversagen, namePos = 1)
 optCutoff(pred = Bili, truth = ITSDaten$Leberversagen, 
           namePos = 1, perfMeasure = "BACC")
@@ -262,14 +256,14 @@ summary(cutoffs)
 ```
 
 
-```{r }
+```{r}
 perfMeasures(pred = Bili, truth = ITSDaten$Leberversagen, 
              namePos = 1, cutoff = mean(cutoffs), 
              measures = c("SENS", "SPEC"))
 ```
 
 
-```{r }
+```{r}
 ## Mehr Gewicht auf Sensitivität
 optCutoff(pred = Bili, truth = ITSDaten$Leberversagen, 
           namePos = 1, perfMeasure = "WACC", wACC = 0.75)
@@ -283,19 +277,19 @@ perfMeasures(pred = Bili, truth = ITSDaten$Leberversagen,
 ```
 
 
-```{r }
+```{r}
 stump <- decisionStump(pred = Bili, truth = ITSDaten$Leberversagen, 
                        namePos = 1)
 stump
 ```
 
 
-```{r }
+```{r}
 predict(stump, newdata = c(4.3, 10.1, 17.4, 28.4, 28.5, 71.0, 93.1))
 ```
 
 
-```{r }
+```{r}
 perfScores(pred = Bili, truth = ITSDaten$Leberversagen, namePos = 1, 
            scores = "AUC")
 perfScores(pred = Bili, truth = ITSDaten$Leberversagen, namePos = 1, 
@@ -441,7 +435,7 @@ KSMDEst <- function(x, i){
 ```
 
 
-```{r}
+```{r cache=TRUE}
 ## Bootstrap-Schätzungen
 boot.out <- boot(ITSDaten$Leberversagen, statistic = KSMDEst, R = 999)
 ## Bootstrap-Konfidenzintervalle
@@ -472,7 +466,7 @@ RMXEst <- function(x, i){
 ```
 
 
-```{r}
+```{r cache = TRUE}
 ## Bootstrap-Schätzungen
 boot.out <- boot(ITSDaten$Temperatur, statistic = RMXEst, R = 999)
 ## Bootstrap-Konfidenzintervall für den Mittelwert
