@@ -1,7 +1,7 @@
 ---
 title: "Kapitel 2: Deskriptive Statistik"
 author: "Matthias Kohl"
-date: "Oktober 2020"
+date: "Oktober 2022"
 output:
   rmarkdown::html_document:
     theme: united
@@ -36,6 +36,21 @@ str(ITSDaten)
 ```
 
 
+```{r}
+ITSDaten <- read.csv2(file = "ITSDaten.csv", fileEncoding = "utf8", 
+                      stringsAsFactors = TRUE)
+## bzw.
+Link <- "https://raw.githubusercontent.com/stamats/ESDR/master/ITSDaten.csv"
+ITSDaten <- read.csv2(file = Link, fileEncoding = "utf8", 
+                      stringsAsFactors = TRUE)
+```
+
+
+```{r}
+str(ITSDaten)
+```
+
+
 ## 2.4 Exkurs: Erweiterungspakete installieren
 
 ```{r, eval=FALSE}
@@ -49,6 +64,7 @@ library(scales)
 library(ggplot2)
 library(MKdescr)
 ```
+
 
 ## 2.5 Kategorielle Variablen
 
@@ -129,7 +145,10 @@ quantile(ITSDaten$SAPS.II, probs = 0.5)
 
 
 ```{r}
+## Intervalllänge
 IQR(ITSDaten$SAPS.II)
+## Bestimmung des IQR-Intervalls
+quantile(ITSDaten$SAPS.II, probs = c(0.25, 0.75))
 ```
 
 
@@ -160,22 +179,28 @@ ggplot(ITSDaten, aes(x=SAPS.II)) +
 ```
 
 
-```{r}
-boxplot(ITSDaten$SAPS.II, main = "500 ITS Patienten", ylab = "SAPS II Score")
+```{r, fig.height=5.5, fig.width=9}
+illustrate.boxplot(ITSDaten$SAPS.II)
 ```
 
 
 ```{r}
 ggplot(ITSDaten, aes(x = 1, y = SAPS.II)) +
   geom_boxplot() + xlim(0, 2) + ylab("SAPS II Score") +
-  ggtitle("500 ITS Patienten")
+  ggtitle("500 ITS Patienten") +
+  ## keine Achsenbeschriftung für die x-Achse
+  xlab("") + theme(axis.ticks.x = element_blank(), 
+                   axis.text.x = element_blank())
 ```
 
 
 ```{r}
 ggplot(ITSDaten, aes(x = 1, y = SAPS.II)) +
   geom_boxplot() + xlim(0, 2) + ylab("SAPS II Score") +
-  geom_point() + ggtitle("500 ITS Patienten")
+  geom_point() + ggtitle("500 ITS Patienten") +
+  ## keine Achsenbeschriftung für die x-Achse
+  xlab("") + theme(axis.ticks.x = element_blank(), 
+                   axis.text.x = element_blank())
 ```
 
 
@@ -190,7 +215,10 @@ ggplot(ITSDaten, aes(x = 1, y = SAPS.II)) +
 ggplot(ITSDaten, aes(x = 1, y = SAPS.II)) +
   geom_boxplot() + xlim(0, 2) + ylab("SAPS II Score") +
   geom_jitter(height = 0, width = 0.1, alpha = 0.2) + 
-  ggtitle("500 ITS Patienten")
+  ggtitle("500 ITS Patienten") +
+  ## keine Achsenbeschriftung für die x-Achse
+  xlab("") + theme(axis.ticks.x = element_blank(), 
+                   axis.text.x = element_blank())
 ```
 
 
@@ -216,6 +244,7 @@ plot(ecdf(ITSDaten$SAPS.II), main = "Empirische Verteilungsfunktion",
 ggplot(ITSDaten, aes(x = SAPS.II)) + stat_ecdf() + xlab("SAPS II") + 
   ylab("Fn(x)") + ggtitle("Empirische Verteilungsfunktion")
 ```
+
 
 ### 2.5.2 Bivariate Analyse
 
@@ -289,6 +318,7 @@ ggplot(ITSDaten, aes(x=SAPS.II, y=LOS)) +
   ## Beschriftung
   ggtitle("SAPS II und LOS") + xlab("SAPS II") + ylab("LOS")
 ```
+
 
 ## 2.6 Metrische Variablen
 
@@ -480,6 +510,7 @@ ggplot(ITSDaten[-398,], aes(x = Temperatur)) + stat_ecdf() +
   ggtitle("Empirische Verteilungsfunktion")
 ```
 
+
 ### 2.6.2 Bivariate Analyse
 
 ```{r}
@@ -503,7 +534,7 @@ ggplot(ITSDaten, aes(x=Temperatur, y=Herzfrequenz)) +
   ## shape = 19: etwas größerer Punkt
   ## alpha = 0.25: Stärke des Blendings
   geom_point(shape=19, alpha=0.25) +
-  ## Lineare Regressionsgerade
+  ## Lineare Regressionsgeraden
   geom_smooth(data = ITSDaten[-398,], method = "lm", se = FALSE) +
   geom_smooth(method = "lm", se = FALSE, color = "red") +
   annotate("text", x = c(25, 25), y = c(110, 105), 
