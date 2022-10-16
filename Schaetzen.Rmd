@@ -52,7 +52,8 @@ library(parallel)
 ## 5.2 Punktschätzer
 
 ```{r}
-ITSDaten <- read.csv2(file = "ITSDaten.csv", fileEncoding = "utf8")
+ITSDaten <- read.csv2(file = "ITSDaten.csv", fileEncoding = "utf8", 
+                      stringsAsFactors = TRUE) 
 ## biasfrei und effizient
 table(ITSDaten$Leberversagen)/nrow(ITSDaten)
 ```
