@@ -15,15 +15,15 @@ install.packages(c("coin", "exactRankTests", "ggpubr", "datarium"))
 
 
 ```{r, message=FALSE}
-library(MKinfer)
-library(coin)
+library(DescTools)
 library(ggplot2)
 library(ggsci)
+library(gridExtra)
+library(MKinfer)
+library(coin)
 library(exactRankTests)
 library(ggpubr)
 library(datarium)
-library(gridExtra)
-library(DescTools)
 ```
 
 ## 6.1 Einführung
@@ -236,7 +236,7 @@ t.test(Temperatur ~ Geschlecht, data = ITSDaten[-398,])
 
 ```{r}
 hsu.t.test(Temperatur ~ Geschlecht, data = ITSDaten[-398,])
-MKinfer::perm.t.test(Temperatur ~ Geschlecht, data = ITSDaten[-398,])
+perm.t.test(Temperatur ~ Geschlecht, data = ITSDaten[-398,])
 boot.t.test(Temperatur ~ Geschlecht, data = ITSDaten[-398,])
 ```
 
