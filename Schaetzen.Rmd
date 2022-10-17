@@ -1,7 +1,7 @@
 ---
 title: "Kapitel 5: Schätzen"
 author: "Matthias Kohl"
-date: "Oktober 2020"
+date: "Oktober 2022"
 output:
   rmarkdown::html_document:
     theme: united
