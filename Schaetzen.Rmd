@@ -284,7 +284,7 @@ perfMeasures(pred = Bili, truth = ITSDaten$Leberversagen,
 ```
 
 
-```{r cache = TRUE}
+```{r, cache = TRUE}
 B <- 1000
 n0 <- sum(ITSDaten$Leberversagen == 0)
 ind0 <- which(ITSDaten$Leberversagen == 0)
@@ -482,7 +482,7 @@ KSMDEst <- function(x, i){
 ```
 
 
-```{r cache=TRUE}
+```{r, cache=TRUE}
 ## Bootstrap-Schätzungen
 boot.out <- boot(ITSDaten$Temperatur, statistic = KSMDEst, R = 999)
 ## Bootstrap-Konfidenzintervalle
@@ -527,7 +527,7 @@ RMXEst <- function(x, i){
 ```
 
 
-```{r cache = TRUE}
+```{r, cache = TRUE}
 ## Bootstrap-Schätzungen
 boot.out <- boot(ITSDaten$Temperatur, statistic = RMXEst, R = 999)
 ## Bootstrap-Konfidenzintervall für den Mittelwert
