@@ -679,7 +679,7 @@ nr.cpus <- detectCores()-1
 
 ```{r, cache=TRUE}
 ## Bootstrap-Schätzungen
-boot.out <- boot(ITSDaten$Temperatur, statistic = MLEst, R = 999,
+boot.out <- boot(ITSDaten.nachHause$SAPS.II, statistic = MLEst, R = 999,
                  parallel = "multicore", ncpus = nr.cpus)
 ## Bootstrap-Konfidenzintervall für scale
 boot.ci(boot.out, index = c(1,3))
