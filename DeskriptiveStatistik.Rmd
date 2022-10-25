@@ -137,6 +137,11 @@ quantile(x, type = 6, probs = 0.2)
 ```
 
 
+```{r, fig.height=4, fig.width=6}
+illustrate.quantile(x, alpha = 0.2)
+```
+
+
 ```{r}
 median(ITSDaten$SAPS.II)
 ## alternativ auch möglich
