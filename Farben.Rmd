@@ -57,7 +57,8 @@ col2rgb("royalblue")
 
 
 ```{r, fig.width=9}
-ITSDaten <- read.csv2(file = "ITSDaten.csv", fileEncoding = "utf8")
+ITSDaten <- read.csv2(file = "ITSDaten.csv", fileEncoding = "utf8",
+                      stringsAsFactors = TRUE)
 barplot(table(ITSDaten$OP), main = "Operationsarten",
         ylab = "Absolute Häufigkeiten", col = farben)
 ```
