@@ -274,7 +274,7 @@ wilcox.test(Temperatur ~ Geschlecht, data = ITSDaten[-398,],
             conf.int = TRUE)
 ## mit Patient 398
 wilcox.test(Temperatur ~ Geschlecht, data = ITSDaten, conf.int = TRUE)
-wilcox_test(Temperatur ~ factor(Geschlecht), data = ITSDaten, conf.int = TRUE,
+wilcox_test(Temperatur ~ Geschlecht, data = ITSDaten, conf.int = TRUE,
             distribution = "approximate")
 wilcox.exact(Temperatur ~ Geschlecht, data = ITSDaten, conf.int = TRUE)
 ```
@@ -316,7 +316,7 @@ kruskal.test(Temperatur ~ Ergebnis, data = ITSDaten[-398,])
 
 
 ```{r}
-kruskal_test(Temperatur ~ factor(Ergebnis), data = ITSDaten, 
+kruskal_test(Temperatur ~ Ergebnis, data = ITSDaten, 
              distribution = "approximate")
 ```
 
