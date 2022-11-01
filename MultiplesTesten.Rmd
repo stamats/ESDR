@@ -16,7 +16,7 @@ install.packages("MKomics")
 ```
 
 
-```{r, message=FALSE}
+```{r}
 library(ggplot2)
 library(MKpower)
 library(multtest)
