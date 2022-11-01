@@ -76,6 +76,40 @@ ggplot(ITSDaten, aes(x=OP)) +
 ```
 
 
+```{r}
+pal_npg()
+```
+
+
+```{r}
+pal_npg()(5)
+```
+
+
+```{r, warning=TRUE}
+farben2 <- brewer.pal(n = 2, name = "Set1")
+farben2
+```
+
+
+```{r}
+farben2 <- brewer.pal(n = 3, name = "Set1")[1:2]
+farben2
+```
+
+
+```{r}
+farben11 <- brewer.pal(n = 11, name = "RdYlBu")
+farben11
+```
+
+
+```{r}
+farben32 <- colorRampPalette(farben11)(32)
+farben32
+```
+
+
 ## 3.2 Exkurs: Export von Diagrammen
 
 ```{r, eval = FALSE}
