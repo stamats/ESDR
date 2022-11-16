@@ -194,7 +194,7 @@ dpois(0, lambda = 1.4)
 ```{r}
 ## a) Mind. eine defekte Glühbirne
 ppois(0, lambda = 1.4, lower.tail = FALSE)
-## b) Mind. 450 Neuerkrankungen
+## b) Mehr als 450 Neuerkrankungen
 ppois(450, lambda = 495, lower.tail = FALSE)
 ```
 

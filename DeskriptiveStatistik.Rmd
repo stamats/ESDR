@@ -440,7 +440,10 @@ Kurt(ITSDaten$LOS)
 ggplot(ITSDaten, aes(x = 1, y = Temperatur)) +
   geom_boxplot() + xlim(0, 2) + ylab("Maximale Körpertemperatur") +
   geom_jitter(height = 0, width = 0.1, alpha = 0.1) + 
-  ggtitle("500 ITS Patienten")
+  ggtitle("500 ITS Patienten") +
+  ## keine Achsenbeschriftung für die x-Achse
+  xlab("") + theme(axis.ticks.x = element_blank(), 
+                   axis.text.x = element_blank())
 ```
 
 
@@ -468,14 +471,14 @@ ggplot(ITSDaten, aes(x = LOS)) + geom_histogram(binwidth = 1) +
 
 ```{r}
 plot(density(ITSDaten$Temperatur[-398]), xlab = "Maximale Körpertemperatur",
-     ylab = "Dichte", main = "500 ITS Patienten")
+     ylab = "Dichte", main = "499 ITS Patienten")
 ```
 
 
 ```{r}
 hist(ITSDaten$Temperatur[-398], breaks = seq(from = 33, to = 42, by = 0.5),
      xlab = "Maximale Körpertemperatur", ylab = "Dichte", freq = FALSE,
-     main = "500 ITS Patienten")
+     main = "499 ITS Patienten")
 lines(density(ITSDaten$Temperatur[-398]))
 ```
 
@@ -485,7 +488,7 @@ ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
   geom_histogram(aes(y=..density..), binwidth = 0.5) +
   geom_density(color = "orange") + ylab("Dichte") +
   xlab("Maximale Körpertemperatur") +
-  ggtitle("500 ITS Patienten")
+  ggtitle("499 ITS Patienten")
 ```
 
 
@@ -494,12 +497,12 @@ ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
   geom_histogram(aes(y=..density..), binwidth = 0.5, closed = "right") +
   geom_density(color = "orange") + ylab("Dichte") +
   xlab("Maximale Körpertemperatur - closed = 'right'") +
-  ggtitle("500 ITS Patienten")
+  ggtitle("499 ITS Patienten")
 ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
   geom_histogram(aes(y=..density..), binwidth = 0.5, closed = "left") +
   geom_density(color = "orange") + ylab("Dichte") +
   xlab("Maximale Körpertemperatur - closed = 'left'") +
-  ggtitle("500 ITS Patienten")
+  ggtitle("499 ITS Patienten")
 ```
 
 
@@ -564,7 +567,7 @@ ggplot(ITSDaten[-398,], aes(x=Temperatur, y=Herzfrequenz)) +
   ## Lineare Regressionsgerade
   geom_smooth(method = "lm", se = FALSE) +
   ## Beschriftung
-  ggtitle("500 ITS Patienten") + xlab("Maximale Körpertemperatur") +
+  ggtitle("499 ITS Patienten") + xlab("Maximale Körpertemperatur") +
   ylab("Maximale Herzfrequenz")
 ```
 
