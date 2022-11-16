@@ -12,6 +12,7 @@ output:
 ```{r, eval=FALSE}
 BiocManager::install("multtest", update = FALSE)
 BiocManager::install("limma", update = FALSE)
+BiocManager::install("ComplexHeatmap", update = FALSE)
 install.packages("MKomics")
 ```
 
