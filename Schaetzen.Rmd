@@ -99,7 +99,8 @@ legend("topright", fill = "darkred", legend = "Geschätztes Modell")
 
 ```{r}
 ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
-  geom_histogram(aes(y=..density..), binwidth = 0.5, fill = "darkgrey") +
+  geom_histogram(aes(y=after_stat(density)), binwidth = 0.5, 
+                 fill = "darkgrey") +
   geom_density(color = "orange") + ylab("Dichte") +
   stat_function(fun = dnorm, args = list(mean = 37.7, sd = 1.2),
                 color = "darkred", lwd = 2) +
@@ -628,7 +629,8 @@ grid.arrange(gg1, gg2, nrow = 1)
 
 ```{r}
 ggplot(ITSDaten.nachHause, aes(x=SAPS.II)) +
-  geom_histogram(aes(y=..density..), binwidth = 5, fill = "darkgrey") +
+  geom_histogram(aes(y=after_stat(density)), binwidth = 5, 
+                 fill = "darkgrey") +
   geom_density(color = "orange") + ylab("Dichte") +
   stat_function(fun = dgamma, args = list(scale = 5.58, shape = 7.0),
                 color = "darkred", lwd = 1.5) +
