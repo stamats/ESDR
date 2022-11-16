@@ -100,7 +100,8 @@ barplot(table(ITSDaten$OP), main = "Operationsarten",
 ## Anlegen der Daten
 ggplot(ITSDaten, aes(x=OP)) +
   ## Hinzufügen der Balken für die relativen Häufigkeiten
-  geom_bar(aes(y = (..count..)/sum(..count..)), width = 0.5) +
+  geom_bar(aes(y = (after_stat(count))/sum(after_stat(count))), 
+           width = 0.5) +
   ## Relative Häufigkeiten in Prozent
   scale_y_continuous(labels = percent_format(accuracy = 1)) +
   ## Titel und Beschriftung der y-Achse
@@ -176,7 +177,7 @@ sIQR(ITSDaten$SAPS.II)
 ## Anlegen der Daten
 ggplot(ITSDaten, aes(x=SAPS.II)) +
   ## Hinzufügen der Balken
-  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  geom_bar(aes(y = (after_stat(count))/sum(after_stat(count)))) +
   ## Relative Häufigkeiten in Prozent
   scale_y_continuous(labels = percent_format(accuracy = 1)) +
   ## Titel und Beschriftung der y-Achse
@@ -293,7 +294,9 @@ barplot(round(100*prop.table(table(ITSDaten$Geschlecht, ITSDaten$OP),
 
 ```{r}
 ggplot(ITSDaten, aes(x = OP, fill = Geschlecht)) +
-  geom_bar(aes(y = (..count..)/tapply(..count.., ..fill.., sum)[..fill..]), 
+  geom_bar(aes(y = (after_stat(count))/tapply(after_stat(count), 
+                                              after_stat(fill), 
+                                              sum)[after_stat(fill)]), 
            position = "dodge") + scale_fill_grey() + 
   scale_y_continuous(labels = percent_format(accuracy = 1)) +
   ylab("Relative Häufigkeit [%]") + xlab("Art der OP") +
@@ -485,7 +488,7 @@ lines(density(ITSDaten$Temperatur[-398]))
 
 ```{r}
 ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
-  geom_histogram(aes(y=..density..), binwidth = 0.5) +
+  geom_histogram(aes(y=after_stat(density)), binwidth = 0.5) +
   geom_density(color = "orange") + ylab("Dichte") +
   xlab("Maximale Körpertemperatur") +
   ggtitle("499 ITS Patienten")
@@ -494,12 +497,12 @@ ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
 
 ```{r}
 ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
-  geom_histogram(aes(y=..density..), binwidth = 0.5, closed = "right") +
+  geom_histogram(aes(y=after_stat(density)), binwidth = 0.5, closed = "right") +
   geom_density(color = "orange") + ylab("Dichte") +
   xlab("Maximale Körpertemperatur - closed = 'right'") +
   ggtitle("499 ITS Patienten")
 ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
-  geom_histogram(aes(y=..density..), binwidth = 0.5, closed = "left") +
+  geom_histogram(aes(y=after_stat(density)), binwidth = 0.5, closed = "left") +
   geom_density(color = "orange") + ylab("Dichte") +
   xlab("Maximale Körpertemperatur - closed = 'left'") +
   ggtitle("499 ITS Patienten")

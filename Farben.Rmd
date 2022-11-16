@@ -68,7 +68,8 @@ barplot(table(ITSDaten$OP), main = "Operationsarten",
 ## Anlegen der Daten
 ggplot(ITSDaten, aes(x=OP)) +
   ## Hinzufügen der Balken für die relativen Häufigkeiten
-  geom_bar(aes(y = 100*(..count..)/sum(..count..)), width = 0.5, 
+  geom_bar(aes(y = 100*(after_stat(count))/sum(after_stat(count))), 
+           width = 0.5, 
   ## Füllen der Balken
            fill = pal_npg()(5)) +
   ## Titel und Beschriftung der y-Achse
