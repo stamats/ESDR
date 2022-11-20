@@ -26,7 +26,8 @@ install.packages("distr6")
 
 ```{r eval=FALSE}
 install.packages("remotes")
-remotes::install_github("alan-turing-institute/distr6")
+remotes::install_github("alan-turing-institute/distr6", 
+                        upgrade = "never", build = FALSE)
 ```
 
 
