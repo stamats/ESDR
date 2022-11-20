@@ -498,7 +498,8 @@ ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
 ```{r}
 ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
   geom_histogram(aes(y=after_stat(density)), 
-                 breaks = seq(from = 33, to = 42, by = 0.5), closed = "right") +
+                 breaks = seq(from = 33, to = 42, by = 0.5), 
+                 closed = "right") +
   geom_density(color = "orange") + ylab("Dichte") +
   xlab("Maximale Körpertemperatur - closed = 'right'") +
   ggtitle("499 ITS Patienten")

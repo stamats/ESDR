@@ -100,11 +100,12 @@ legend("topright", fill = "darkred", legend = "Geschätztes Modell")
 
 ```{r}
 ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
-  geom_histogram(aes(y=after_stat(density)), binwidth = 0.5, 
+  geom_histogram(aes(y=after_stat(density)), 
+                 breaks = seq(from = 33, to = 42, by = 0.5), 
                  fill = "darkgrey") +
   geom_density(color = "orange") + ylab("Dichte") +
   stat_function(fun = dnorm, args = list(mean = 37.7, sd = 1.2),
-                color = "darkred", lwd = 2) +
+                color = "darkred", linewidth = 2) +
   annotate("text", x = 40, y = 0.31, col = "darkred",
            label = "Geschätztes Modell")+
   ggtitle("Maximale Körpertemperatur")

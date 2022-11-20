@@ -156,7 +156,8 @@ hist(ITSDaten$Temperatur[-398], breaks = seq(from = 33.5, to = 42, by = 0.5),
 
 ```{r}
 ggplot(ITSDaten[-398,], aes(x=Temperatur)) +
-  geom_histogram(binwidth = 0.5, fill = c(farben1, farben2, farben3))+
+  geom_histogram(breaks = seq(from = 33.5, to = 42, by = 0.5), 
+                 fill = c(farben1, farben2, farben3)) +
   ylab("Absolute Häufigkeit") + xlab("Maximale Körpertemperatur") +
   ggtitle("500 ITS Patienten")
 ```
