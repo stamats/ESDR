@@ -24,7 +24,8 @@ install.packages(c("distrMod", "qqplotr", "RobLox", "gridExtra", "MKinfer",
 ```{r, eval=FALSE}
 ## Development Version von GitHub
 # install.packages("remotes")
-remotes::install_github("stamats/rmx", build_vignettes = TRUE)
+remotes::install_github("stamats/rmx", upgrade = "never", 
+                        build = FALSE, build_vignettes = TRUE)
 ```
 
 
