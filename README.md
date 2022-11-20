@@ -1,6 +1,6 @@
-# Einführung in die Statistische Datenanalyse mit R
+# Einführung in die Statistische Datenanalyse mit R (ESDR)
 
-![Buchcover](cover.jpg)
+![ESDR](hex-ESDR.png)
 
 In diesem Repository finden Sie die Dateien für mein Buch "Einführung in die Statistische Datenanalyse mit R" (2. Auflage).
 
