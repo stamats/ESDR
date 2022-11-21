@@ -100,6 +100,12 @@ farben2
 
 
 ```{r}
+farben3 <- pal_npg()(5)[c(5,1,3)]
+farben3
+```
+
+
+```{r}
 farben11 <- brewer.pal(n = 11, name = "RdYlBu")
 farben11
 ```
