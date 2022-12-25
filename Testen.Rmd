@@ -341,6 +341,15 @@ pairwise.fun(ITSDaten$Temperatur[-398], ITSDaten$Ergebnis[-398],
 
 
 ```{r}
+## paarweise Welch t-Tests ohne Patient 398
+pairwise.ext.t.test(ITSDaten$Temperatur[-398], ITSDaten$Ergebnis[-398],
+                pool.sd = FALSE)
+## paarweise Wilcoxon-Mann-Whitney U-Tests
+pairwise.wilcox.exact(ITSDaten$Temperatur, ITSDaten$Ergebnis)
+```
+
+
+```{r}
 AM <- tapply(ITSDaten$Temperatur[-398], ITSDaten$Ergebnis[-398], mean)
 KI <- tapply(ITSDaten$Temperatur[-398], ITSDaten$Ergebnis[-398], meanCI)
 n <- tapply(ITSDaten$Temperatur[-398], ITSDaten$Ergebnis[-398], length)
@@ -432,6 +441,14 @@ pairwise.fun(SE.lang$Score, SE.lang$Zeitpunkt, function(x, y) mean(x-y))
 pairwise.fun(SE.lang$Score, SE.lang$Zeitpunkt, function(x, y) sd(x-y))
 ## Mediane
 pairwise.fun(SE.lang$Score, SE.lang$Zeitpunkt, function(x, y) median(x-y))
+```
+
+
+```{r}
+## Paarweise gepaarte t-Tests
+pairwise.ext.t.test(SE.lang$Score, SE.lang$Zeitpunkt, paired = TRUE)
+## Paarweise Wilcoxon Vorzeichenrangtests
+pairwise.wilcox.exact(SE.lang$Score, SE.lang$Zeitpunkt, paired = TRUE)
 ```
 
 
