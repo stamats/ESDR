@@ -377,7 +377,7 @@ sd(ITSDaten$Temperatur)
 ```{r}
 n <- nrow(ITSDaten)
 (n-1)/n*var(ITSDaten$Temperatur)
-(n-1)/n*sd(ITSDaten$Temperatur)
+sqrt((n-1)/n)*sd(ITSDaten$Temperatur)
 ```
 
 
