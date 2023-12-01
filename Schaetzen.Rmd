@@ -669,7 +669,7 @@ MDEst <- function(x, i){
   c(estimate(res), diag(asvar(res)))
 }
 RMXEst <- function(x, i){
-  res <- roptest(x[i], ParamFamily = GammaFamily(), 
+  res <- roptest(x[i], L2Fam = GammaFamily(), 
                  eps.lower = 0, eps.upper = 0.05, steps = 3)
   c(estimate(res), diag(asvar(res)))
 }
