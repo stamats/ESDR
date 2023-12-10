@@ -117,8 +117,8 @@ ggplot(ITSDaten[-398,], aes(sample = Temperatur)) +
   qqplotr::stat_pp_band(dparams = list(mean = 37.7, sd = 1.2)) + 
   qqplotr::stat_pp_point(dparams = list(mean = 37.7, sd = 1.2)) + 
   qqplotr::stat_pp_line() + 
-  xlab("Modell für Maximale Körpertemperatur") + 
-  ylab("Beobachtete Maximale Körpertemperatur") + 
+  xlab("Beobachtete Maximale Körpertemperatur") + 
+  ylab("Modell für Maximale Körpertemperatur") + 
   ggtitle("pp-Plot für Norm(37.7, 1.2)")
 ```
 
@@ -564,8 +564,8 @@ gg1 <- ggplot(ITSDaten.nachHause, aes(sample = SAPS.II)) +
   qqplotr::stat_pp_point(dparams = list(scale = 5.58, shape = 7.0),
                          distribution = "gamma") +
   qqplotr::stat_pp_line() + 
-  xlab("Kumulative Wahrscheinlichkeit des Modells") + 
-  ylab("Beobachtete kumulative Wahrscheinlichkeit") + 
+  xlab("Beobachtete kumulative Wahrscheinlichkeit") + 
+  ylab("Kumulative Wahrscheinlichkeit des Modells") + 
   ggtitle("pp-Plot: ML-Schätzer")
 gg2 <- ggplot(ITSDaten.nachHause, aes(sample = SAPS.II)) + 
   qqplotr::stat_qq_band(dparams = list(scale = 5.58, shape = 7.0), 
@@ -588,8 +588,8 @@ gg1 <- ggplot(ITSDaten.nachHause, aes(sample = SAPS.II)) +
   qqplotr::stat_pp_point(dparams = list(scale = 6.03, shape = 6.46),
                          distribution = "gamma") +
   qqplotr::stat_pp_line() + 
-  xlab("Kumulative Wahrscheinlichkeit des Modells") + 
-  ylab("Beobachtete kumulative Wahrscheinlichkeit") + 
+  xlab("Beobachtete kumulative Wahrscheinlichkeit") + 
+  ylab("Kumulative Wahrscheinlichkeit des Modells") + 
   ggtitle("pp-Plot: CvM-MD-Schätzer")
 gg2 <- ggplot(ITSDaten.nachHause, aes(sample = SAPS.II)) + 
   qqplotr::stat_qq_band(dparams = list(scale = 6.03, shape = 6.46), 
@@ -612,8 +612,8 @@ gg1 <- ggplot(ITSDaten.nachHause, aes(sample = SAPS.II)) +
   qqplotr::stat_pp_point(dparams = list(scale = 5.90, shape = 6.66),
                          distribution = "gamma") +
   qqplotr::stat_pp_line() + 
-  xlab("Kumulative Wahrscheinlichkeit des Modells") + 
-  ylab("Beobachtete kumulative Wahrscheinlichkeit") + 
+  xlab("Beobachtete kumulative Wahrscheinlichkeit") + 
+  ylab("Kumulative Wahrscheinlichkeit des Modells") + 
   ggtitle("pp-Plot: RMX-Schätzer")
 gg2 <- ggplot(ITSDaten.nachHause, aes(sample = SAPS.II)) + 
   qqplotr::stat_qq_band(dparams = list(scale = 5.90, shape = 6.66), 
